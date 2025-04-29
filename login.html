@@ -5,157 +5,457 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Ingia - MKOPO CHAPCHAP</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.10.5/dist/sweetalert2.min.css">
   <style>
+    :root {
+      --primary: #3498db;
+      --primary-dark: #2980b9;
+      --error: #e74c3c;
+      --error-dark: #c0392b;
+      --text: #2c3e50;
+      --text-light: #7f8c8d;
+      --glass: rgba(255, 255, 255, 0.25);
+      --glass-border: rgba(255, 255, 255, 0.3);
+      --glass-shadow: rgba(0, 0, 0, 0.1);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
     body {
-      background: #3498db;
+      background: linear-gradient(135deg, #3498db, #2c3e50);
       min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       padding: 2rem;
+      overflow-x: hidden;
     }
 
     .form-container {
-      background: white;
-      border-radius: 15px;
-      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-      padding: 2rem;
+      width: 100%;
       max-width: 500px;
-      margin: 0 auto;
+      background: var(--glass);
+      backdrop-filter: blur(16px) saturate(180%);
+      -webkit-backdrop-filter: blur(16px) saturate(180%);
+      border-radius: 20px;
+      border: 1px solid var(--glass-border);
+      box-shadow: 
+        0 8px 32px 0 var(--glass-shadow),
+        20px 20px 40px -10px rgba(0, 0, 0, 0.2),
+        -5px -5px 10px rgba(255, 255, 255, 0.1);
+      padding: 2.5rem;
       text-align: center;
+      position: relative;
+      overflow: hidden;
+      z-index: 1;
+    }
+
+    .form-container::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 70%);
+      z-index: -1;
+      animation: rotate 20s linear infinite;
+    }
+
+    @keyframes rotate {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
     }
 
     .logo {
       width: 180px;
-      margin-bottom: 0.5rem;
-      margin-top: -20px;
-      animation: bounceZoomPulse 4s ease forwards;
+      margin-bottom: 1rem;
+      filter: drop-shadow(0 5px 15px rgba(0,0,0,0.2));
+      transition: all 0.5s ease;
     }
 
-    @keyframes bounceZoomPulse {
-      0%   { transform: translateY(0) scale(1); }
-      15%  { transform: translateY(-20px) rotate(-5deg) scale(1.05); }
-      30%  { transform: translateY(10px) rotate(5deg) scale(1.1); }
-      45%  { transform: translateY(-10px) rotate(-3deg) scale(1.15); }
-      60%  { transform: translateY(5px) rotate(2deg) scale(1.2); }
-      70%  { transform: translateY(0) rotate(0deg) scale(1.25); }
-      80%  { transform: scale(1.22); }
-      90%  { transform: scale(1.27); }
-      100% { transform: scale(1.25); }
+    .logo:hover {
+      transform: scale(1.05) rotate(5deg);
+      filter: drop-shadow(0 8px 20px rgba(0,0,0,0.3));
     }
 
     .form-container h1 {
-      color: #2c3e50;
+      color: white;
       margin-bottom: 1.5rem;
-      margin-top: 0.5rem;
       font-size: 1.8rem;
+      text-shadow: 0 2px 5px rgba(0,0,0,0.2);
+      font-weight: 600;
+    }
+
+    .form-group {
+      margin-bottom: 1.5rem;
+      text-align: left;
     }
 
     .form-container label {
       display: block;
       margin-bottom: 0.5rem;
-      color: #7f8c8d;
-      text-align: left;
+      color: white;
+      font-weight: 500;
+      text-shadow: 0 1px 2px rgba(0,0,0,0.2);
     }
 
     .form-container input {
       width: 100%;
-      padding: 12px;
-      margin-bottom: 1.5rem;
-      border: 2px solid #ecf0f1;
-      border-radius: 8px;
-      transition: border-color 0.3s;
+      padding: 15px 20px;
+      background: rgba(255, 255, 255, 0.2);
+      border: none;
+      border-radius: 12px;
+      color: white;
+      font-size: 1rem;
+      box-shadow: 
+        inset 3px 3px 5px rgba(0, 0, 0, 0.1),
+        inset -3px -3px 5px rgba(255, 255, 255, 0.1),
+        5px 5px 10px rgba(0, 0, 0, 0.1);
+      transition: all 0.3s ease;
+    }
+
+    .form-container input::placeholder {
+      color: rgba(255, 255, 255, 0.7);
     }
 
     .form-container input:focus {
-      border-color: #3498db;
       outline: none;
+      background: rgba(255, 255, 255, 0.3);
+      box-shadow: 
+        inset 2px 2px 5px rgba(0, 0, 0, 0.2),
+        inset -2px -2px 5px rgba(255, 255, 255, 0.1),
+        5px 5px 10px rgba(0, 0, 0, 0.2);
     }
 
-    .form-container button[type="submit"] {
+    .btn {
       width: 100%;
-      padding: 12px;
-      background: linear-gradient(90deg, #3498db, #2980b9);
-      color: white;
+      padding: 15px;
       border: none;
-      border-radius: 8px;
+      border-radius: 12px;
+      font-size: 1rem;
+      font-weight: 600;
       cursor: pointer;
-      font-weight: bold;
-      transition: all 0.3s;
+      transition: all 0.3s ease;
+      box-shadow: 
+        5px 5px 10px rgba(0, 0, 0, 0.2),
+        -3px -3px 5px rgba(255, 255, 255, 0.1);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      color: white;
       margin-top: 10px;
     }
 
-    .form-container button[type="submit"]:hover {
-      opacity: 0.9;
+    .btn-primary:hover {
       transform: translateY(-2px);
+      box-shadow: 
+        8px 8px 15px rgba(0, 0, 0, 0.3),
+        -5px -5px 10px rgba(255, 255, 255, 0.1);
+      opacity: 0.95;
     }
 
-    .home-btn {
-      margin-top: 1rem;
-      width: 100%;
-      padding: 10px;
-      background: #e74c3c;
+    .btn-primary:active {
+      transform: translateY(0);
+      box-shadow: 
+        3px 3px 5px rgba(0, 0, 0, 0.2),
+        -1px -1px 3px rgba(255, 255, 255, 0.1);
+    }
+
+    .btn-error {
+      background: linear-gradient(135deg, var(--error), var(--error-dark));
       color: white;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: all 0.3s;
+      margin-top: 1rem;
     }
 
-    .home-btn:hover {
-      background: #c0392b;
+    .spinner {
+      border: 4px solid rgba(255, 255, 255, 0.1);
+      border-radius: 50%;
+      border-top: 4px solid white;
+      width: 30px;
+      height: 30px;
+      animation: spin 1s linear infinite;
+      margin: 15px auto;
+      display: none;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .register-link {
+      display: block;
+      margin-top: 1.5rem;
+      color: white;
+      text-decoration: none;
+      font-weight: 500;
+      text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+      transition: all 0.3s ease;
+    }
+
+    .register-link:hover {
+      text-decoration: underline;
+      transform: translateX(5px);
+    }
+
+    /* Floating bubbles background */
+    .bubbles {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+      overflow: hidden;
+    }
+
+    .bubble {
+      position: absolute;
+      bottom: -100px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 50%;
+      animation: rise 15s infinite ease-in;
+    }
+
+    .bubble:nth-child(1) {
+      width: 40px;
+      height: 40px;
+      left: 10%;
+      animation-duration: 8s;
+    }
+
+    .bubble:nth-child(2) {
+      width: 20px;
+      height: 20px;
+      left: 20%;
+      animation-duration: 5s;
+      animation-delay: 1s;
+    }
+
+    .bubble:nth-child(3) {
+      width: 50px;
+      height: 50px;
+      left: 35%;
+      animation-duration: 7s;
+      animation-delay: 2s;
+    }
+
+    .bubble:nth-child(4) {
+      width: 80px;
+      height: 80px;
+      left: 50%;
+      animation-duration: 11s;
+      animation-delay: 0s;
+    }
+
+    .bubble:nth-child(5) {
+      width: 35px;
+      height: 35px;
+      left: 55%;
+      animation-duration: 6s;
+      animation-delay: 1s;
+    }
+
+    .bubble:nth-child(6) {
+      width: 45px;
+      height: 45px;
+      left: 65%;
+      animation-duration: 8s;
+      animation-delay: 3s;
+    }
+
+    .bubble:nth-child(7) {
+      width: 25px;
+      height: 25px;
+      left: 75%;
+      animation-duration: 7s;
+      animation-delay: 2s;
+    }
+
+    .bubble:nth-child(8) {
+      width: 80px;
+      height: 80px;
+      left: 80%;
+      animation-duration: 6s;
+      animation-delay: 1s;
+    }
+
+    @keyframes rise {
+      0% {
+        bottom: -100px;
+        transform: translateX(0);
+      }
+      50% {
+        transform: translateX(100px);
+      }
+      100% {
+        bottom: 1080px;
+        transform: translateX(-200px);
+      }
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+      body {
+        padding: 1rem;
+      }
+      
+      .form-container {
+        padding: 1.5rem;
+      }
+      
+      .form-container h1 {
+        font-size: 1.5rem;
+      }
     }
   </style>
 </head>
 <body>
+  <!-- Floating bubbles background -->
+  <div class="bubbles">
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+  </div>
+
   <div class="form-container">
     <img src="logo.png" alt="Logo ya Kampuni" class="logo">
     <h1>Ingia kwenye Akaunti Yako</h1>
+    
     <form id="loginForm">
-      <label for="phone">Namba ya Simu:</label>
-      <input type="text" id="phone" required>
-
-      <label for="nida">Namba ya NIDA:</label>
-      <input type="password" id="nida" required>
-
-      <button type="submit">Ingia</button>
+      <div class="form-group">
+        <label for="phone">Namba ya Simu:</label>
+        <input type="tel" id="phone" placeholder="07XXXXXXXX" required>
+      </div>
+      
+      <div class="form-group">
+        <label for="nida">Namba ya NIDA:</label>
+        <input type="password" id="nida" placeholder="Namba ya NIDA (tarakimu 20)" required>
+      </div>
+      
+      <div class="spinner" id="spinner"></div>
+      <button type="submit" class="btn btn-primary">Ingia</button>
+      
+      <a href="signup.html" class="register-link">
+        <i class="fas fa-user-plus"></i> Hauna akaunti? Jiunge sasa
+      </a>
     </form>
 
-    <button class="home-btn" onclick="window.location.href='index.html'">Nyumbani 🏠</button>
+    <button class="btn btn-error" onclick="window.location.href='index.html'">
+      <i class="fas fa-home"></i> Nyumbani
+    </button>
   </div>
 
-  <script src="https://cdn.backendless.com/8C78F96A-9B54-419D-B353-7FFA41C0001F/52CCEB97-D67E-42BA-BABE-55ACD1CE7970/web/sdk.js"></script>
-
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script>
-  Backendless.initApp('52CCEB97-D67E-42BA-BABE-55ACD1CE7970', '8C78F96A-9B54-419D-B353-7FFA41C0001F');
-
-  document.getElementById('loginForm').addEventListener('submit', function (event) {
-    event.preventDefault();
-
-    var phone = document.getElementById('phone').value.trim();
-    var nida = document.getElementById('nida').value.trim();
-
-    // Step 1: Check if user exists in localStorage
-    var localUserData = localStorage.getItem(phone);
-    if (localUserData) {
-      var user = JSON.parse(localUserData);
-      if (user.nida === nida) {
-        alert("Umefanikiwa kuingia kupitia localStorage!");
-        localStorage.setItem("loggedInUser", JSON.stringify(user));
-        window.location.href = "profile.html"; // updated redirect
-        return;
-      } else {
-        alert("Namba ya NIDA haifanani!");
+    document.getElementById('loginForm').addEventListener('submit', function (event) {
+      event.preventDefault();
+      
+      const spinner = document.getElementById('spinner');
+      const phone = document.getElementById('phone').value.trim();
+      const nida = document.getElementById('nida').value.trim();
+      
+      // Validate phone number format
+      if (!/^0[67]\d{8}$/.test(phone)) {
+        Swal.fire({
+          title: 'Hitilafu',
+          text: 'Tafadhali ingiza namba ya simu sahihi (Airtel, Tigo, Halotel au Vodacom)',
+          icon: 'error',
+          background: 'rgba(255, 255, 255, 0.9)',
+          backdrop: 'rgba(0, 0, 0, 0.5)'
+        });
         return;
       }
-    }
+      
+      // Validate NIDA format (20 digits)
+      if (!/^\d{20}$/.test(nida)) {
+        Swal.fire({
+          title: 'Hitilafu',
+          text: 'Namba ya NIDA inapaswa kuwa na tarakimu 20',
+          icon: 'error',
+          background: 'rgba(255, 255, 255, 0.9)',
+          backdrop: 'rgba(0, 0, 0, 0.5)'
+        });
+        return;
+      }
+      
+      spinner.style.display = 'block';
+      
+      // Check user in localStorage
+      setTimeout(() => {
+        const userData = localStorage.getItem(`mkopo_user_${phone}`);
+        
+        if (userData) {
+          const user = JSON.parse(userData);
+          
+          if (user.nida === nida) {
+            // Successful login
+            localStorage.setItem('currentUser', JSON.stringify(user));
+            spinner.style.display = 'none';
+            
+            Swal.fire({
+              title: 'Karibu tena!',
+              text: `Umefanikiwa kuingia kama ${user.firstName} ${user.lastName}`,
+              icon: 'success',
+              confirmButtonText: 'Endelea',
+              background: 'rgba(255, 255, 255, 0.9)',
+              backdrop: 'rgba(0, 0, 0, 0.5)'
+            }).then(() => {
+              window.location.href = 'profile.html';
+            });
+          } else {
+            spinner.style.display = 'none';
+            Swal.fire({
+              title: 'Hitilafu',
+              text: 'Namba ya NIDA sio sahihi',
+              icon: 'error',
+              background: 'rgba(255, 255, 255, 0.9)',
+              backdrop: 'rgba(0, 0, 0, 0.5)'
+            });
+          }
+        } else {
+          spinner.style.display = 'none';
+          Swal.fire({
+            title: 'Akaunti Haipatikani',
+            text: 'Akaunti hii haijasajiliwa. Tafadhali jiunge kwanza',
+            icon: 'error',
+            confirmButtonText: 'Jiunge Sasa',
+            showCancelButton: true,
+            cancelButtonText: 'Funga',
+            background: 'rgba(255, 255, 255, 0.9)',
+            backdrop: 'rgba(0, 0, 0, 0.5)'
+          }).then((result) => {
+            if (result.isConfirmed) {
+              window.location.href = 'signup.html';
+            }
+          });
+        }
+      }, 1000);
+    });
 
-    // Step 2: If not in localStorage, try Backendless login
-    Backendless.UserService.login(phone, nida, true)
-      .then(function(user) {
-        window.location.href = 'profile.html'; // updated redirect
-      })
-      .catch(function(error) {
-        alert('Login failed: ' + error.message);
-      });
-  });
-</script>
+    // Load phone number from localStorage if available
+    window.addEventListener('DOMContentLoaded', () => {
+      const lastUserPhone = localStorage.getItem('lastUserPhone');
+      if (lastUserPhone) {
+        document.getElementById('phone').value = lastUserPhone;
+        document.getElementById('nida').focus();
+      }
+    });
+  </script>
 </body>
 </html>
