@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="sw">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mkopo wa Wafanyabiashara wa Kati - MKOPO CHAPCHAP</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        /* STILI ZA MSINGI */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            min-height: 100vh;
+        }
+
+        .header {
+            background: linear-gradient(90deg, #2c3e50, #3498db);
+            color: white;
+            padding: 4rem 2rem 2rem;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            position: relative;
+        }
+
+        .home-btn {
+            position: absolute;
+            left: 20px;
+            top: 20px;
+            padding: 10px 20px;
+            background: #e74c3c;
+            color: white;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .home-btn:hover {
+            transform: scale(1.05);
+            background: #c0392b;
+        }
+
+        .loan-details {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 2rem;
+        }
+
+        .feature-card {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            margin: 1.5rem 0;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transition: transform 0.3s;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .icon {
+            font-size: 2.5rem;
+            color: #3498db;
+            margin-bottom: 1rem;
+        }
+
+        h1, h2 {
+            color: #2c3e50;
+            margin-bottom: 1.5rem;
+        }
+
+        ul {
+            list-style: none;
+            padding: 1rem;
+        }
+
+        li {
+            margin: 1rem 0;
+            padding: 0.8rem;
+            background: #f8f9fa;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+        }
+
+        li i {
+            color: #27ae60;
+            margin-right: 1rem;
+        }
+
+        .auth-buttons {
+            text-align: center;
+            margin: 2rem 0;
+        }
+
+        .auth-btn {
+            padding: 12px 30px;
+            margin: 0 1rem;
+            border: none;
+            border-radius: 30px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .login-btn {
+            background: linear-gradient(90deg, #3498db, #2980b9);
+            color: white;
+        }
+
+        .signup-btn {
+            background: linear-gradient(90deg, #27ae60, #219a52);
+            color: white;
+        }
+
+        @media (max-width: 768px) {
+            .loan-details {
+                padding: 1rem;
+            }
+            
+            .feature-card {
+                padding: 1rem;
+            }
+            
+            .auth-buttons {
+                flex-direction: column;
+                gap: 1rem;
+            }
+        }
+
+        /* STILI MAALUM KWA WAFANYABIASHARA */
+        .icon.fa-store-alt {
+            color: #e67e22;
+        }
+
+        .feature-card:nth-child(odd) {
+            background: linear-gradient(45deg, #ffffff, #fdf2e9);
+        }
+
+        .feature-card:nth-child(even) {
+            background: linear-gradient(45deg, #fdf2e9, #ffffff);
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <button class="home-btn" onclick="window.location.href='index.html'">
+            <i class="fas fa-home"></i> Nyumbani
+        </button>
+        <h1>MKOPO WA WAFANYABIASHARA WA KATI</h1>
+        <p>Kuimarisha Biashara Yako Kwa Urahisi</p>
+    </div>
+
+    <div class="loan-details">
+        <div class="feature-card">
+            <i class="fas fa-store-alt icon"></i>
+            <h2>Msaada wa Biashara</h2>
+            <ul>
+                <li><i class="fas fa-check-circle"></i> Kiasi: TSh 3,000,000 - 30,000,000</li>
+                <li><i class="fas fa-check-circle"></i> Riba 7% kwa mwaka</li>
+                <li><i class="fas fa-check-circle"></i> Muda wa kulipa: Miezi 6-24</li>
+            </ul>
+        </div>
+
+        <div class="feature-card">
+            <i class="fas fa-chart-line icon"></i>
+            <h2>Faida za Ziada</h2>
+            <ul>
+                <li><i class="fas fa-check-circle"></i> Mafunzo ya uboreshaji wa biashara</li>
+                <li><i class="fas fa-check-circle"></i> Ufadhili wa zana za kibiashara</li>
+                <li><i class="fas fa-check-circle"></i> Msaada wa utambulishaji wa soko</li>
+            </ul>
+        </div>
+    </div>
+        <!-- Jinsi ya Kutuma Maombi -->
+        <div class="feature-card">
+            <i class="fas fa-file-alt icon"></i>
+            <h2>Jinsi ya Kuomba</h2>
+            <ul>
+                <li><i class="fas fa-check-circle"></i> Jaza fomu ya baada ya kujiunga kwa urahisi</li>
+                <li><i class="fas fa-check-circle"></i> Ambatanisha nyaraka zako kupitia mfumo wetu salama</li>
+                <li><i class="fas fa-check-circle"></i> Utapokea uamuzi ndani ya saa 24</li>
+                <li><i class="fas fa-check-circle"></i> Pokea fedha zako moja kwa moja kwenye akaunti ya benki au namba ya simu</li>
+            </ul>
+        </div>
+    <div class="auth-buttons">
+        <button class="auth-btn login-btn" onclick="window.location.href='login.html'">Ingia</button>
+        <button class="auth-btn signup-btn" onclick="window.location.href='signup.html'">Jiunge Sasa</button>
+    </div>
+</body>
+</html>

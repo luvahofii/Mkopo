@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="sw">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mkopo kwa Wajasiriamali wa Kati - MKOPO CHAPCHAP</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        /* Stili za Msingi */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+        }
+
+        /* Kichwa */
+        .header {
+            background: linear-gradient(90deg, #2c3e50, #3498db);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .home-btn {
+            position: absolute;
+            left: 20px;
+            top: 20px;
+            padding: 10px 20px;
+            background: #e74c3c;
+            color: white;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .home-btn:hover {
+            transform: scale(1.05);
+            background: #c0392b;
+        }
+
+        /* Sehemu ya Maelezo */
+        .loan-details {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 2rem;
+        }
+
+        .feature-card {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            margin: 1.5rem 0;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transition: transform 0.3s;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .icon {
+            font-size: 2.5rem;
+            color: #3498db;
+            margin-bottom: 1rem;
+        }
+
+        h2 {
+            color: #2c3e50;
+            margin-bottom: 1.5rem;
+            border-left: 5px solid #3498db;
+            padding-left: 1rem;
+        }
+
+        ul {
+            list-style: none;
+            padding: 1rem;
+        }
+
+        li {
+            margin: 1rem 0;
+            padding: 0.8rem;
+            background: #f8f9fa;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+        }
+
+        li i {
+            color: #27ae60;
+            margin-right: 1rem;
+        }
+
+        /* Vifungo vya Kuingia/Jiunge */
+        .auth-buttons {
+            text-align: center;
+            margin: 2rem 0;
+        }
+
+        .auth-btn {
+            padding: 12px 30px;
+            margin: 0 1rem;
+            border: none;
+            border-radius: 30px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .login-btn {
+            background: linear-gradient(90deg, #3498db, #2980b9);
+            color: white;
+        }
+
+        .signup-btn {
+            background: linear-gradient(90deg, #27ae60, #219a52);
+            color: white;
+        }
+
+        .auth-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        /* FAQ Sehemu */
+        .faq-section {
+            background: #ffffff;
+            padding: 2rem;
+            margin: 2rem 0;
+            border-radius: 15px;
+        }
+
+        .faq-item {
+            margin: 1.5rem 0;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 1rem;
+        }
+
+        /* Media Queries kwa Rununu */
+        @media (max-width: 768px) {
+            .loan-details {
+                padding: 1rem;
+            }
+            
+            .feature-card {
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Kichwa -->
+    <div class="header">
+        <button class="home-btn" onclick="window.location.href='index.html'"><i class="fas fa-home"></i> Nyumbani</button>
+        <h1>MKOPO KWA WAJASIRIAMALI WA KATI</h1>
+        <p>Kukuza Biashara Yako Kwa Urahisi Zaidi</p>
+    </div>
+
+    <!-- Maelezo ya Mkopo -->
+    <div class="loan-details">
+        <!-- Kiasi cha Mkopo -->
+        <div class="feature-card">
+            <i class="fas fa-coins icon"></i>
+            <h2>Kiasi cha Mkopo</h2>
+            <ul>
+                <li><i class="fas fa-check-circle"></i> Kuanzia TSh 50,000 hadi TSh 5,000,000</li>
+                <li><i class="fas fa-check-circle"></i> Uwezo wa kuchagua mfumo wa malipo unaokufaa, kwa siku, wiki au mwezi</li>
+                <li><i class="fas fa-check-circle"></i> Muda wa kukopa hadi miezi 36</li>
+            </ul>
+        </div>
+
+        <!-- Faida -->
+        <div class="feature-card">
+            <i class="fas fa-medal icon"></i>
+            <h2>Faida Za Mkopo Wetu</h2>
+            <ul>
+                <li><i class="fas fa-check-circle"></i> Riba Nafuu ya 8% kwa mwaka</li>
+                <li><i class="fas fa-check-circle"></i> Haina malipo ya nyongeza</li>
+                <li><i class="fas fa-check-circle"></i> Kupata mkopo  haraka ndani ya masaa 24</li>
+                <li><i class="fas fa-check-circle"></i> Msaada wa kitaalamu katika kufanya malipo</li>
+            </ul>
+        </div>
+
+        <!-- Mahitaji -->
+        <div class="feature-card">
+            <i class="fas fa-clipboard-list icon"></i>
+            <h2>Mahitaji </h2>
+            <ul>
+                <li><i class="fas fa-check-circle"></i> Umiliki wa biashara</li>
+                <li><i class="fas fa-check-circle"></i> Rekodi nzuri ya kulipa mikopo</li>
+                <li><i class="fas fa-check-circle"></i> Taarifa za kifedha isio na mashaka</li>
+                <li><i class="fas fa-check-circle"></i> Kitambulisho halali cha NIDA</li>
+            </ul>
+        </div>
+
+        <!-- Jinsi ya Kutuma Maombi -->
+        <div class="feature-card">
+            <i class="fas fa-file-alt icon"></i>
+            <h2>Jinsi ya Kuomba</h2>
+            <ul>
+                <li><i class="fas fa-check-circle"></i> Jaza fomu ya baada ya kujiunga kwa urahisi</li>
+                <li><i class="fas fa-check-circle"></i> Ambatanisha nyaraka zako kupitia mfumo wetu salama</li>
+                <li><i class="fas fa-check-circle"></i> Utapokea uamuzi ndani ya saa 24</li>
+                <li><i class="fas fa-check-circle"></i> Pokea fedha zako moja kwa moja kwenye akaunti ya benki au namba ya simu</li>
+            </ul>
+        </div>
+
+        <!-- Maswali Yanayoulizwa Mara kwa Mara -->
+        <div class="faq-section">
+            <h2>Maswali ya Kawaida</h2>
+            <div class="faq-item">
+                <h3>Je, naweza kuomba tena baada ya kukamilisha mkopo?</h3>
+                <p>Ndio, mteja aliye na historia nzuri anaweza kuomba tena kwa masharti bora zaidi.</p>
+            </div>
+            <div class="faq-item">
+                <h3>Je, kuna dhamana inayohitajika?</h3>
+                <p>Dhamana hutegemea kiasi cha mkopo na historia ya kifedha ya mteja.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Vifungo vya Kuingia/Jiunge -->
+    <div class="auth-buttons">
+        <button class="auth-btn login-btn" onclick="window.location.href='login.html'">Ingia</button>
+        <button class="auth-btn signup-btn" onclick="window.location.href='signup.html'">Jiunge Sasa</button>
+    </div>
+</body>
+</html>

@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="sw">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Jiunge Nasi - MKOPO CHAPCHAP</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.10.5/dist/sweetalert2.min.css">
+  <!-- Added jsPDF script as requested -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <style>
+    /* STILI ZA MSINGI */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Arial', sans-serif;
+    }
+
+    body {
+      background: #3498db;
+      min-height: 100vh;
+      padding: 2rem;
+    }
+
+    .form-container {
+      background: white;
+      border-radius: 15px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+      padding: 2rem;
+      max-width: 800px;
+      margin: 0 auto;
+      position: relative;
+    }
+
+    .logo {
+      display: block;
+      margin: 0 auto 1.5rem auto;
+      max-width: 150px;
+    }
+
+    .form-container h1 {
+      color: #2c3e50;
+      margin-bottom: 1.5rem;
+      text-align: center;
+    }
+
+    .form-container h2 {
+      color: #3498db;
+      margin-bottom: 1rem;
+      border-bottom: 2px solid #3498db;
+      padding-bottom: 0.5rem;
+    }
+
+    .form-container label {
+      display: block;
+      margin-bottom: 0.5rem;
+      color: #7f8c8d;
+    }
+
+    .form-container input,
+    .form-container select,
+    .form-container textarea {
+      width: 100%;
+      padding: 12px;
+      margin-bottom: 1.5rem;
+      border: 2px solid #ecf0f1;
+      border-radius: 8px;
+      transition: border-color 0.3s;
+    }
+
+    .form-container input:focus,
+    .form-container select:focus,
+    .form-container textarea:focus {
+      border-color: #3498db;
+      outline: none;
+    }
+
+    .form-container .name-boxes {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .form-container .name-boxes input {
+      flex: 1;
+    }
+
+    .form-container button[type="submit"] {
+      width: 100%;
+      padding: 12px;
+      background: linear-gradient(90deg, #27ae60, #219a52);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: all 0.3s;
+    }
+
+    .form-container button[type="submit"]:hover {
+      opacity: 0.9;
+      transform: translateY(-2px);
+    }
+
+    .home-btn {
+      margin-top: 1rem;
+      width: 100%;
+      padding: 10px;
+      background: #e74c3c;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .home-btn:hover {
+      background: #c0392b;
+    }
+
+    .image-preview {
+      margin-bottom: 1.5rem;
+      text-align: center;
+    }
+
+    .image-preview img {
+      max-width: 200px;
+      border-radius: 10px;
+      margin-top: 0.5rem;
+    }
+
+    .spinner-overlay {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(255, 255, 255, 0.8);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 15px;
+      display: none;
+      z-index: 10;
+    }
+
+    .spinner {
+      border: 6px solid #f3f3f3;
+      border-top: 6px solid #3498db;
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    @media (max-width: 768px) {
+      body {
+        padding: 1rem;
+      }
+
+      .form-container {
+        padding: 1.5rem;
+      }
+
+      .form-container .name-boxes {
+        flex-direction: column;
+        gap: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<div class="form-container">
+  <img src="assets/logo.png" alt="Logo" class="logo"> <!-- Add your logo here -->
+
+  <div class="spinner-overlay" id="spinnerOverlay">
+    <div class="spinner"></div>
+  </div>
+
+  <h1>Jiunge Nasi</h1>
+
+  <form id="signupForm" onsubmit="signup(event)">
+    <!-- TAARIFA BINAFSI -->
+    <h2>TAARIFA BINAFSI</h2>
+    <div class="name-boxes">
+      <input type="text" id="firstName" placeholder="Jina la Kwanza" required>
+      <input type="text" id="middleName" placeholder="Jina la Kati" required>
+      <input type="text" id="lastName" placeholder="Jina la Mwisho" required>
+    </div>
+    <input type="text" id="nida" placeholder="Namba ya NIDA" required>
+    <input type="text" id="phone" placeholder="Namba ya Simu" required>
+    <select id="mkoa" required>
+      <option value="">Chagua Mkoa</option>
+      <script>
+        const regions = ["Arusha", "Dar es Salaam", "Dodoma", "Geita", "Iringa", "Kagera", "Kaskazini Pemba", "Kaskazini Unguja", "Katavi", "Kigoma", "Kilimanjaro", "Kusini Pemba", "Kusini Unguja", "Lindi", "Manyara", "Mara", "Mbeya", "Mjini Magharibi", "Morogoro", "Mtwara", "Mwanza", "Njombe", "Pwani", "Rukwa", "Ruvuma", "Shinyanga", "Simiyu", "Singida", "Songwe", "Tabora", "Tanga"];
+        regions.forEach(region => {
+          document.write(`<option value="${region}">${region}</option>`);
+        });
+      </script>
+    </select>
+    <input type="text" id="wilaya" placeholder="Wilaya" required>
+    <input type="text" id="kata" placeholder="Kata" required>
+    <input type="text" id="mtaa" placeholder="Mtaa" required>
+    <input type="text" id="biashara" placeholder="Eneo la Biashara (kama ni mfanyabiashara)">
+
+    <!-- Additional photo input as requested -->
+    <label for="photo">Picha ya Profaili</label>
+    <input type="file" id="photo" accept="image/*" required>
+
+    <!-- MTU WA KARIBU -->
+    <h2>MTU WA KARIBU</h2>
+    <div class="name-boxes">
+      <input type="text" id="contactFirstName" placeholder="Jina la Kwanza" required>
+      <input type="text" id="contactMiddleName" placeholder="Jina la Kati" required>
+      <input type="text" id="contactLastName" placeholder="Jina la Mwisho" required>
+    </div>
+    <input type="text" id="contactPhone" placeholder="Namba ya Simu" required>
+    <select id="contactMkoa" required>
+      <option value="">Chagua Mkoa</option>
+      <script>
+        regions.forEach(region => {
+          document.write(`<option value="${region}">${region}</option>`);
+        });
+      </script>
+    </select>
+    <input type="text" id="contactWilaya" placeholder="Wilaya" required>
+    <input type="text" id="contactKata" placeholder="Kata" required>
+    <input type="text" id="contactMtaa" placeholder="Mtaa" required>
+    <input type="text" id="contactUhusiano" placeholder="Uhusiano" required>
+
+    <!-- VIAMBATANISHO -->
+    <h2>VIAMBATANISHO</h2>
+    <label for="applicantPhoto">Picha ya Muombaji wa Mkopo</label>
+    <input type="file" id="applicantPhoto" accept="image/*" capture="environment" required onchange="previewImage(this, 'applicantPreview')">
+    <div class="image-preview" id="applicantPreview"></div>
+
+    <label for="nidaPhoto">Picha ya Kitambulisho cha NIDA</label>
+    <input type="file" id="nidaPhoto" accept="image/*" capture="environment" required onchange="previewImage(this, 'nidaPreview')">
+    <div class="image-preview" id="nidaPreview"></div>
+
+    <button type="submit">Wasilisha Fomu</button>
+  </form>
+
+  <button class="home-btn" onclick="window.location.href='index.html'">Nyumbani 🏠</button>
+</div>
+
+<!-- Updated JavaScript section as requested -->
+<script src="https://cdn.backendless.com/sdk/js/latest/backendless.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+  Backendless.initApp('52CCEB97-D67E-42BA-BABE-55ACD1CE7970', '8C78F96A-9B54-419D-B353-7FFA41C0001F');
+
+  async function signup(event) {
+    event.preventDefault();
+    const spinner = document.getElementById('spinnerOverlay');
+    spinner.style.display = 'flex'; // Show spinner
+const formData = {
+  firstName: document.getElementById('firstName').value,
+  middleName: document.getElementById('middleName').value,
+  lastName: document.getElementById('lastName').value,
+  phone: document.getElementById('phone').value,
+  nida: document.getElementById('nida').value,
+  region: document.getElementById('region').value,
+  district: document.getElementById('district').value,
+  ward: document.getElementById('ward').value,
+  photoBase64: capturedPhotoDataURL // if you're capturing photo
+};
+
+// Combine full name
+formData.fullName = `${formData.firstName} ${formData.middleName} ${formData.lastName}`.trim();
+
+// Save to localStorage
+localStorage.setItem('signupData', JSON.stringify(formData));
+    // Collect form data
+    const user = {
+      nida: document.getElementById('nida').value,
+      phone: document.getElementById('phone').value,
+      firstName: document.getElementById('firstName').value,
+      middleName: document.getElementById('middleName').value,
+      lastName: document.getElementById('lastName').value,
+      mkoa: document.getElementById('mkoa').value,
+      wilaya: document.getElementById('wilaya').value,
+      kata: document.getElementById('kata').value,
+      mtaa: document.getElementById('mtaa').value,
+      biashara: document.getElementById('biashara').value,
+      contactFirstName: document.getElementById('contactFirstName').value,
+      contactMiddleName: document.getElementById('contactMiddleName').value,
+      contactLastName: document.getElementById('contactLastName').value,
+      contactPhone: document.getElementById('contactPhone').value,
+      contactMkoa: document.getElementById('contactMkoa').value,
+      contactWilaya: document.getElementById('contactWilaya').value,
+      contactKata: document.getElementById('contactKata').value,
+      contactMtaa: document.getElementById('contactMtaa').value,
+      contactUhusiano: document.getElementById('contactUhusiano').value
+    };
+
+    // Backendless registration
+    const backendlessUser = {
+      email: user.phone,
+      password: user.nida,
+      firstName: user.firstName,
+      middleName: user.middleName,
+      lastName: user.lastName,
+      phone: user.phone,
+      mkoa: user.mkoa,
+      wilaya: user.wilaya,
+      kata: user.kata,
+      mtaa: user.mtaa,
+      biashara: user.biashara
+    };
+
+    try {
+      await Backendless.UserService.register(backendlessUser);
+
+      // Save to localStorage
+      localStorage.setItem('userInfo', JSON.stringify(user));
+      localStorage.setItem('nida', user.nida);
+      localStorage.setItem('password', user.phone);
+
+      // Generate and store PDF
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+      doc.setFontSize(12);
+      doc.text("TAARIFA YA MWOMBAJI", 10, 10);
+      
+      // Personal Information Section
+      doc.setFontSize(10);
+      doc.text("TAARIFA BINAFSI", 10, 20);
+      doc.text(`Jina Kamili: ${user.firstName} ${user.middleName} ${user.lastName}`, 10, 30);
+      doc.text(`NIDA: ${user.nida}`, 10, 40);
+      doc.text(`Simu: ${user.phone}`, 10, 50);
+      doc.text(`Mkoa: ${user.mkoa}`, 10, 60);
+      doc.text(`Wilaya: ${user.wilaya}`, 10, 70);
+      doc.text(`Kata: ${user.kata}`, 10, 80);
+      doc.text(`Mtaa: ${user.mtaa}`, 10, 90);
+      doc.text(`Eneo la Biashara: ${user.biashara || 'Hakuna'}`, 10, 100);
+      
+      // Emergency Contact Section
+      doc.text("MTU WA KARIBU", 10, 115);
+      doc.text(`Jina: ${user.contactFirstName} ${user.contactMiddleName} ${user.contactLastName}`, 10, 125);
+      doc.text(`Simu: ${user.contactPhone}`, 10, 135);
+      doc.text(`Uhusiano: ${user.contactUhusiano}`, 10, 145);
+      doc.text(`Mkoa: ${user.contactMkoa}`, 10, 155);
+      doc.text(`Wilaya: ${user.contactWilaya}`, 10, 165);
+      doc.text(`Kata: ${user.contactKata}`, 10, 175);
+      doc.text(`Mtaa: ${user.contactMtaa}`, 10, 185);
+
+      // Add date and signature fields
+      doc.text("Saini ya Mwombaji: _________________________", 10, 200);
+      doc.text("Tarehe: _________________________", 10, 210);
+
+      const pdfBlob = doc.output("blob");
+      const reader = new FileReader();
+      reader.onloadend = function() {
+        const base64data = reader.result;
+        localStorage.setItem("formPDF", base64data);
+        
+        // Show success message with download option
+        Swal.fire({
+          icon: 'success',
+          title: 'Hongera!',
+          html: 'Usajili umefanikiwa na taarifa zimehifadhiwa!<br><br><button onclick="downloadPDF()" style="background:#27ae60;color:white;border:none;padding:10px 20px;border-radius:5px;cursor:pointer">Pakua PDF</button>',
+          confirmButtonColor: '#27ae60',
+          showCancelButton: true,
+          cancelButtonText: 'Funga',
+          showConfirmButton: false
+        });
+      };
+      reader.readAsDataURL(pdfBlob);
+
+      document.getElementById('signupForm').reset();
+      document.getElementById('applicantPreview').innerHTML = '';
+      document.getElementById('nidaPreview').innerHTML = '';
+    } catch (error) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Imeshindikana!',
+        text: error.message,
+        confirmButtonColor: '#e74c3c'
+      });
+    } finally {
+      spinner.style.display = 'none'; // Hide spinner
+    }
+  }
+
+  function downloadPDF() {
+    const pdfData = localStorage.getItem("formPDF");
+    if (pdfData) {
+      const link = document.createElement('a');
+      link.href = pdfData;
+      link.download = 'MkopoChapChap_Application.pdf';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } else {
+      Swal.fire({
+        icon: 'error',
+        title: 'Hitilafu',
+        text: 'Hakuna faili ya PDF iliyohifadhiwa',
+        confirmButtonColor: '#e74c3c'
+      });
+    }
+  }
+
+  function previewImage(input, previewId) {
+    const preview = document.getElementById(previewId);
+    preview.innerHTML = '';
+    if (input.files && input.files[0]) {
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        const img = document.createElement('img');
+        img.src = e.target.result;
+        preview.appendChild(img);
+        
+        // Store image in localStorage
+        localStorage.setItem(previewId, e.target.result);
+      };
+      reader.readAsDataURL(input.files[0]);
+    }
+  }
+
+  // Load saved images on page load
+  window.addEventListener('DOMContentLoaded', () => {
+    const applicantPreview = localStorage.getItem('applicantPreview');
+    const nidaPreview = localStorage.getItem('nidaPreview');
+    
+    if (applicantPreview) {
+      const img = document.createElement('img');
+      img.src = applicantPreview;
+      document.getElementById('applicantPreview').appendChild(img);
+    }
+    
+    if (nidaPreview) {
+      const img = document.createElement('img');
+      img.src = nidaPreview;
+      document.getElementById('nidaPreview').appendChild(img);
+    }
+  });
+
+  // Added registerUser function as requested
+  function registerUser() {
+    const fileInput = document.getElementById('photo');
+    const file = fileInput.files[0];
+
+    if (!file) {
+      alert('Tafadhali chagua picha.');
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onloadend = function () {
+      const photoBase64 = reader.result;
+
+      const formData = {
+        firstName: document.getElementById('firstName').value,
+        middleName: document.getElementById('middleName').value,
+        lastName: document.getElementById('lastName').value,
+        phone: document.getElementById('phone').value,
+        nida: document.getElementById('nida').value,
+        region: document.getElementById('mkoa').value,
+        district: document.getElementById('wilaya').value,
+        ward: document.getElementById('kata').value,
+        photoBase64: photoBase64
+      };
+
+      formData.fullName = `${formData.firstName} ${formData.middleName} ${formData.lastName}`.trim();
+
+      localStorage.setItem('signupData', JSON.stringify(formData));
+
+      alert('Taarifa zimehifadhiwa kwa mafanikio!');
+      window.location.href = 'akaunti.html'; // Unaweza kuelekeza popote unapotaka
+    };
+
+    reader.readAsDataURL(file);
+  }
+</script>
+
+</body>
+</html>

@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="sw">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Omba Mkopo - MKOPO CHAPCHAP</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <style>
+    /* STILI ZA MSINGI */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Arial', sans-serif;
+    }
+
+    body {
+      background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+      min-height: 100vh;
+      padding: 2rem;
+    }
+
+    .loan-form {
+      background: white;
+      border-radius: 15px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+      padding: 2rem;
+      max-width: 800px;
+      margin: 0 auto;
+      text-align: center;
+      position: relative;
+    }
+
+    .loan-form img.logo {
+      width: 150px;
+      margin-bottom: 1rem;
+      animation: fadeZoom 1.2s ease forwards;
+      opacity: 0;
+      transform: scale(0.8);
+    }
+
+    @keyframes fadeZoom {
+      to {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+
+    .loan-form h1 {
+      color: #2c3e50;
+      margin-bottom: 1.5rem;
+    }
+
+    .loan-form label {
+      display: block;
+      margin-bottom: 0.5rem;
+      color: #7f8c8d;
+      text-align: left;
+    }
+
+    .loan-form input,
+    .loan-form select,
+    .loan-form textarea {
+      width: 100%;
+      padding: 12px;
+      margin-bottom: 1.5rem;
+      border: 2px solid #ecf0f1;
+      border-radius: 8px;
+      transition: border-color 0.3s;
+    }
+
+    .loan-form input:focus,
+    .loan-form select:focus,
+    .loan-form textarea:focus {
+      border-color: #3498db;
+      outline: none;
+    }
+
+    .loan-form button[type="submit"] {
+      width: 100%;
+      padding: 12px;
+      background: linear-gradient(90deg, #27ae60, #219a52);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+      font-size: 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      transition: all 0.3s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .loan-form button[type="submit"]:hover {
+      opacity: 0.9;
+      transform: translateY(-2px);
+    }
+
+    .spinner {
+      border: 3px solid #f3f3f3;
+      border-top: 3px solid white;
+      border-radius: 50%;
+      width: 18px;
+      height: 18px;
+      animation: spin 1s linear infinite;
+      position: absolute;
+      display: none;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .home-btn {
+      margin-top: 1rem;
+      width: 100%;
+      padding: 10px;
+      background: #e74c3c;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .home-btn:hover {
+      background: #c0392b;
+    }
+
+    .info-display, .pdf-section {
+      text-align: left;
+      margin-bottom: 1.5rem;
+      background: #f6f6f6;
+      padding: 1rem;
+      border-radius: 10px;
+    }
+
+    .info-display p {
+      margin-bottom: 0.5rem;
+      font-size: 0.95rem;
+      color: #2c3e50;
+    }
+
+    iframe {
+      border: 1px solid #ccc;
+      border-radius: 8px;
+    }
+
+    /* Toast Style */
+    .toast {
+      position: fixed;
+      top: 30px;
+      right: 30px;
+      background: #27ae60;
+      color: white;
+      padding: 15px 20px;
+      border-radius: 8px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+      opacity: 0;
+      transform: translateY(-20px);
+      transition: all 0.5s ease, opacity 1s ease;
+      z-index: 1000;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .toast.hide {
+      opacity: 0;
+      transform: translateY(-20px);
+    }
+
+    /* Confirmation Modal */
+    .confirmation-modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.5);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+
+    .confirmation-modal.show {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    .confirmation-box {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      text-align: center;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    }
+
+    .confirmation-box button {
+      margin: 10px;
+      padding: 10px 20px;
+      background: #3498db;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .confirmation-box button:hover {
+      background: #2980b9;
+    }
+
+  </style>
+</head>
+<body>
+  <div class="loan-form">
+    <img src="assets/logo.png" alt="MKOPO CHAPCHAP Logo" class="logo">
+    <h1>Omba Mkopo</h1>
+
+    <!-- Display user info -->
+    <div class="info-display">
+      <p><strong>NIDA:</strong> <span id="nidaDisplay"></span></p>
+      <p><strong>Simu:</strong> <span id="phoneDisplay"></span></p>
+    </div>
+
+    <!-- Display saved signup form PDF -->
+    <div class="pdf-section">
+      <p><strong>Fomu ya Usajili (PDF):</strong></p>
+      <iframe id="pdfPreview" width="100%" height="300px"></iframe>
+    </div>
+
+    <form id="loanForm">
+      <label for="loan-type">Aina ya Mkopo:</label>
+      <select id="loan-type" required>
+        <option value="">Chagua Aina ya Mkopo</option>
+        <option value="mkopo_wa_mwanafunzi">Mkopo wa Mwanafunzi</option>
+        <option value="mkopo_wa_wakulima">Mkopo wa Wakulima</option>
+        <option value="mkopo_binafsi">Mkopo Binafsi</option>
+        <option value="mkopo_wa_wajasiriamali">Mkopo wa Wajasiriamali</option>
+        <option value="mkopo_wa_wafanyabiashara_wa_kat">Mkopo wa Wafanyabiashara wa Kati</option>
+      </select>
+
+      <label for="loan-period">Muda wa Kulipa:</label>
+      <select id="loan-period" required>
+        <option value="">Chagua Muda wa Kulipa</option>
+        <option value="1_month">Miezi 1</option>
+        <option value="6_months">Miezi 6</option>
+        <option value="1_year">Mwaka 1</option>
+        <option value="2_years">Miaka 2</option>
+        <option value="3_years">Miaka 3</option>
+      </select>
+
+      <label for="loan-amount">Kiasi cha Mkopo (TSh):</label>
+      <input type="number" id="loan-amount" placeholder="Weka kiasi unachohitaji" required>
+
+      <label for="loan-purpose">Sababu ya Mkopo:</label>
+      <textarea id="loan-purpose" rows="4" placeholder="Eleza sababu ya mkopo" required></textarea>
+
+      <button type="submit">
+        <div class="spinner" id="spinner"></div>
+        <span id="submit-text">Wasilisha Maombi</span>
+      </button>
+    </form>
+
+    <button class="home-btn" onclick="window.location.href='profile.html'">Rudi kwenye Profaili</button>
+  </div>
+
+  <div id="toast" class="toast">Maombi yametumwa kwa mafanikio!</div>
+
+  <div id="confirmationModal" class="confirmation-modal">
+    <div class="confirmation-box">
+      <p>Je, unataka kweli kutuma maombi?</p>
+      <button id="confirmSubmit">Ndio</button>
+      <button id="cancelSubmit">Hapana</button>
+    </div>
+  </div>
+
+  <script>
+    const loanForm = document.getElementById('loanForm');
+    const submitBtn = loanForm.querySelector('button[type="submit"]');
+    const spinner = document.getElementById('spinner');
+    const submitText = document.getElementById('submit-text');
+    const toast = document.getElementById('toast');
+    const confirmationModal = document.getElementById('confirmationModal');
+    const confirmSubmit = document.getElementById('confirmSubmit');
+    const cancelSubmit = document.getElementById('cancelSubmit');
+
+    // Load user info and PDF from localStorage
+    const user = JSON.parse(localStorage.getItem("userInfo"));
+    const pdfData = localStorage.getItem("formPDF");
+
+    if (user) {
+      document.getElementById("nidaDisplay").textContent = user.nida;
+      document.getElementById("phoneDisplay").textContent = user.phone;
+    }
+
+    if (pdfData) {
+      document.getElementById("pdfPreview").src = pdfData;
+    }
+
+    loanForm.addEventListener('submit', function(e) {
+      e.preventDefault();
+      confirmationModal.classList.add('show');
+    });
+
+    cancelSubmit.addEventListener('click', () => {
+      confirmationModal.classList.remove('show');
+    });
+
+    confirmSubmit.addEventListener('click', () => {
+      spinner.style.display = 'inline-block';
+      submitText.textContent = 'Tafadhali subiri...';
+      submitBtn.disabled = true;
+
+      setTimeout(() => {
+        spinner.style.display = 'none';
+        submitText.textContent = 'Wasilisha Maombi';
+        submitBtn.disabled = false;
+
+        toast.classList.add('show');
+        setTimeout(() => {
+          toast.classList.remove('show');
+          toast.classList.add('hide');
+        }, 2000);
+        setTimeout(() => {
+          window.location.href = 'profile.html';
+        }, 3000);
+      }, 2000);
+
+      confirmationModal.classList.remove('show');
+    });
+  </script>
+</body>
+</html>

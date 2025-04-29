@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="sw">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Profaili - MKOPO CHAPCHAP</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"/>
+  <style>
+    body {
+      background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+      min-height: 100vh;
+      padding: 2rem;
+    }
+
+    .profile-banner {
+      background: linear-gradient(90deg, #2c3e50, #3498db);
+      color: white;
+      padding: 2rem;
+      border-radius: 15px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      display: flex;
+      align-items: center;
+      gap: 2rem;
+      flex-direction: column;
+      text-align: center;
+    }
+
+    .profile-banner img {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      border: 3px solid white;
+    }
+
+    .profile-info {
+      margin-top: 1rem;
+    }
+
+    .profile-info h1 {
+      margin-bottom: 0.5rem;
+    }
+
+    .profile-info p {
+      margin: 0.3rem 0;
+    }
+
+    .profile-buttons {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      margin: 2rem 0;
+      flex-direction: column;
+    }
+
+    .profile-buttons button {
+      padding: 12px 30px;
+      border: none;
+      border-radius: 30px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .profile-buttons button:hover {
+      opacity: 0.9;
+      transform: translateY(-2px);
+    }
+
+    .account-btn {
+      background: linear-gradient(90deg, #3498db, #2980b9);
+      color: white;
+    }
+
+    .loan-btn {
+      background: linear-gradient(90deg, #27ae60, #219a52);
+      color: white;
+    }
+
+    .repayment-btn {
+      background: linear-gradient(90deg, #e74c3c, #c0392b);
+      color: white;
+    }
+
+    .logo {
+      width: 120px;
+      margin-bottom: 1rem;
+      display: block;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    @media (max-width: 768px) {
+      .profile-banner {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+      }
+
+      .profile-buttons {
+        flex-direction: column;
+        gap: 1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <img class="logo" src="assets/logo.png" alt="MKOPO CHAPCHAP Logo" />
+
+  <div class="profile-banner">
+    <img id="profilePic" src="default_image.jpg" alt="Picha ya Profaili"/>
+    <div class="profile-info">
+      <h1 id="profileName">Guest</h1>
+      <p id="profilePhone">Simu: Not provided</p>
+      <p id="profileNida">NIDA: Not provided</p>
+    </div>
+  </div>
+
+  <div class="profile-buttons">
+    <button class="account-btn" onclick="window.location.href='akaunti.html'">Akaunti Yangu</button>
+    <button class="loan-btn" onclick="window.location.href='maombi.html'">Omba Mkopo</button>
+    <button class="repayment-btn" onclick="window.location.href='marejesho.html'">Marejesho</button>
+  </div>
+
+  <script>
+    // Load user from localStorage
+    const loggedUser = JSON.parse(localStorage.getItem("loggedInUser"));
+
+    if (loggedUser) {
+      document.getElementById('profileName').textContent = loggedUser.fullName || 'Guest';
+      document.getElementById('profilePhone').textContent = `Simu: ${loggedUser.phone || 'Not provided'}`;
+      document.getElementById('profileNida').textContent = `NIDA: ${loggedUser.nida || 'Not provided'}`;
+      document.getElementById('profilePic').src = loggedUser.profilePicture || 'default_image.jpg';
+    } else {
+      alert("Tafadhali ingia kwanza.");
+      window.location.href = 'index.html';
+    }
+  </script>
+</body>
+</html>

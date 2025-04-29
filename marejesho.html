@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="sw">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Marejesho - MKOPO CHAPCHAP</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        /* STILI ZA MSINGI */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            min-height: 100vh;
+            padding: 2rem;
+        }
+
+        .repayment-container {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            padding: 2rem;
+            max-width: 800px;
+            margin: 0 auto;
+            text-align: center;
+            position: relative;
+        }
+
+        /* Logo styling */
+        .logo {
+            width: 150px;
+            margin-bottom: 1rem;
+        }
+
+        .repayment-container h1 {
+            color: #2c3e50;
+            margin-bottom: 1.5rem;
+        }
+
+        .repayment-container p {
+            color: #7f8c8d;
+            margin-bottom: 1.5rem;
+        }
+
+        .home-btn {
+            margin-top: 1rem;
+            width: 100%;
+            padding: 10px;
+            background: #e74c3c;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .home-btn:hover {
+            background: #c0392b;
+        }
+
+        /* Toast Style */
+        .toast {
+            position: fixed;
+            top: 30px;
+            right: 30px;
+            background: #e74c3c;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            opacity: 0;
+            transform: translateY(-20px);
+            transition: all 0.5s ease, opacity 1s ease;
+            z-index: 1000;
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .toast.hide {
+            opacity: 0;
+            transform: translateY(-20px);
+        }
+
+        @media (max-width: 768px) {
+            .repayment-container {
+                padding: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="repayment-container">
+        <!-- Logo added -->
+        <img src="assets/logo.png" alt="MKopo Chapchap Logo" class="logo">
+        <h1>Marejesho</h1>
+        <p id="message">HAUNA MKOPO WOWOTE KWA SASA, HAUWEZI KUFANYA MAREJESHO.</p>
+        <p>JAZA FOMU YA MAOMBI KWA UKAMILIFU KUPATA MKOPO.</p>
+        <button class="home-btn" onclick="window.location.href='profile.html'">Rudi kwenye Profaili</button>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast">Hauwezi kufanya marejesho kwa sasa!</div>
+
+    <script>
+        // Simulate loan data check
+        const hasLoan = false;  // You can dynamically set this from your backend or Firebase
+
+        if (!hasLoan) {
+            // Show a toast notification for no loans available
+            const toast = document.getElementById('toast');
+            toast.classList.add('show');
+
+            // Fade out after 3 seconds
+            setTimeout(() => {
+                toast.classList.remove('show');
+                toast.classList.add('hide');
+            }, 3000);
+        }
+
+        // Change the message dynamically based on loan status
+        const message = document.getElementById('message');
+        if (hasLoan) {
+            message.textContent = "Una mkopo unaoweza kurejesha.";
+        }
+    </script>
+</body>
+</html>

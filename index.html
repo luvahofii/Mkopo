@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="sw">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>MKOPO CHAPCHAP</title>
+
+  <!-- SEO and Meta -->
+  <meta name="description" content="Mkopo Chapchap - Pata mkopo wa haraka kwa wajasiriamali, wafanyabiashara, wakulima, na wanafunzi nchini Tanzania.">
+  <meta name="keywords" content="mkopo, mkopo chapchap, mkopo wa haraka, Tanzania, wajasiriamali, wakulima, wanafunzi">
+  <meta name="author" content="Mkopo Chapchap Team">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="assets/favicon.png">
+
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+      background: linear-gradient(to right, #e0f7fa, #e1f5fe);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    /* Popup Style */
+    #popup {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%;
+      height: 100%;
+      background: 
+        linear-gradient(rgba(255,255,255,0.8), rgba(255,255,255,0.8)),
+        url('assets/file_00000000935451f6a6234d9f2c87d40a_conversation_id=67f6bfdb-c50c-8002-9faf-3eab487f3477&message_id=dbff5e5e-8b19-41ee-9385-293a3d45d583 (5).PNG') 
+        center/cover no-repeat;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+      transition: opacity 1s ease;
+    }
+
+    #popup img {
+      width: 400px;
+      height: auto;
+      margin-bottom: 20px;
+    }
+
+    .loading-line {
+      width: 200px;
+      height: 4px;
+      background: #ddd;
+      border-radius: 2px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .loading-line::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: -50%;
+      width: 50%;
+      height: 100%;
+      background: linear-gradient(to right, #0077b6, #00b4d8);
+      animation: loadingAnimation 5s linear forwards, glowAnimation 1.5s infinite alternate;
+    }
+
+    @keyframes loadingAnimation {
+      0% { left: -50%; }
+      100% { left: 100%; }
+    }
+
+    @keyframes glowAnimation {
+      0% { box-shadow: 0 0 10px rgba(0, 183, 216, 0.5); }
+      100% { box-shadow: 0 0 20px rgba(0, 183, 216, 1); }
+    }
+
+    .banner {
+      background: 
+        linear-gradient(90deg, #0077b6cc, #00b4d8cc),
+        url('assets/pesa.png') 
+        center/cover no-repeat;
+      color: #fff;
+      text-align: center;
+      padding: 3rem 1rem;
+      animation: fadeIn 1.5s ease-in-out;
+      border-radius: 0 0 20px 20px;
+    }
+
+    .banner h1 {
+      font-size: 2.8rem;
+      margin-bottom: 1rem;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 12px;
+      text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
+      animation: slideInDown 1s ease-in-out;
+    }
+
+    .provider-logos, .bank-logos {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      margin-bottom: 1.5rem;
+      flex-wrap: wrap;
+    }
+
+    .provider-logos img,
+    .bank-logos img {
+      height: 40px;
+      width: auto;
+      border-radius: 10px;
+      background: #ffffffaa;
+      padding: 5px;
+      transition: transform 0.3s ease;
+    }
+
+    .provider-logos img:hover,
+    .bank-logos img:hover {
+      transform: scale(1.1);
+    }
+
+    .buttons {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 1rem;
+      margin-top: 2rem;
+    }
+
+    .buttons button {
+      background: #ffffff22;
+      color: #fff;
+      border: 2px solid #fff;
+      border-radius: 10px;
+      padding: 1rem 1.5rem;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(6px);
+      min-width: 220px;
+      opacity: 0;
+      transform: translateY(30px);
+      animation: buttonBounce 1s forwards;
+    }
+
+    .buttons button:nth-child(1) { animation-delay: 0.3s; }
+    .buttons button:nth-child(2) { animation-delay: 0.5s; }
+    .buttons button:nth-child(3) { animation-delay: 0.7s; }
+    .buttons button:nth-child(4) { animation-delay: 0.9s; }
+    .buttons button:nth-child(5) { animation-delay: 1.1s; }
+    .buttons button:nth-child(6) { animation-delay: 1.3s; }
+
+    @keyframes buttonBounce {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .buttons button:hover {
+      background-color: #00b4d8;
+      transform: translateY(-5px);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    .login-banner {
+      background: 
+        linear-gradient(#ffffffcc, #ffffffcc),
+        url('assets/file_00000000935451f6a6234d9f2c87d40a_conversation_id=67f6bfdb-c50c-8002-9faf-3eab487f3477&message_id=dbff5e5e-8b19-41ee-9385-293a3d45d583 (5).PNG') 
+        center/cover no-repeat;
+      background-blend-mode: overlay;
+      border-radius: 15px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+      margin: 10px auto 0 auto;
+      max-width: 700px;
+      text-align: center;
+      padding: 2rem;
+      animation: fadeIn 2s ease;
+    }
+
+    .login-banner h2 {
+      color: #023e8a;
+      margin-bottom: 1rem;
+      font-size: 1.8rem;
+      animation: slideInLeft 1s ease;
+    }
+
+    .login-banner p {
+      color: #495057;
+      margin-bottom: 1.5rem;
+      font-size: 1rem;
+      animation: slideInRight 1s ease;
+    }
+
+    .login-buttons {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    #login-btn, #signup-btn {
+      padding: 0.75rem 2rem;
+      font-size: 1rem;
+      border: none;
+      border-radius: 25px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    #login-btn {
+      background: linear-gradient(to right, #0077b6, #00b4d8);
+      color: #fff;
+    }
+
+    #signup-btn {
+      background: linear-gradient(to right, #43aa8b, #90be6d);
+      color: #fff;
+    }
+
+    #login-btn:hover, #signup-btn:hover {
+      opacity: 0.9;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    @keyframes slideInDown {
+      from { transform: translateY(-50px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    @keyframes slideInLeft {
+      from { transform: translateX(-30px); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+
+    @keyframes slideInRight {
+      from { transform: translateX(30px); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+
+    @media (max-width: 600px) {
+      .banner h1 {
+        font-size: 2rem;
+        flex-direction: column;
+      }
+
+      .buttons button {
+        font-size: 0.9rem;
+        padding: 0.8rem;
+      }
+
+      .provider-logos img,
+      .bank-logos img {
+        height: 30px;
+      }
+
+      #popup img {
+        width: 250px;
+      }
+
+      .loading-line {
+        width: 150px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Popup -->
+<div id="popup">
+  <img src="assets/logo.png" alt="Mkopo Chapchap Logo">
+  <div class="loading-line"></div>
+</div>
+<script>
+  window.addEventListener('load', function() {
+    const popup = document.getElementById('popup');
+    setTimeout(() => {
+      popup.style.opacity = '0';
+      setTimeout(() => popup.style.display = 'none', 1000);
+    }, 5000); // Wait 5 seconds before starting to hide
+  });
+</script>
+
+<!-- Main Banner -->
+<div class="banner">
+  <div class="provider-logos">
+    <img src="assets/airtel.png" alt="Airtel Money Service Logo" />
+    <img src="assets/vodacom.png" alt="Vodacom M-Pesa Logo" />
+    <img src="assets/yas.png" alt="YAS Mobile Money Logo" />
+    <img src="assets/halotel.png" alt="Halotel HaloPesa Logo" />
+  </div>
+
+  <h1>MKOPO CHAPCHAP</h1>
+
+  <div class="buttons">
+    <button onclick="location.href='wajasiriamali.html'">Wajasiriamali</button>
+    <button onclick="location.href='wafanyabiashara.html'">Wafanyabiashara wa Kati</button>
+    <button onclick="location.href='wakulima.html'">Wakulima</button>
+    <button onclick="location.href='wanafunzi.html'">Wanafunzi</button>
+    <button onclick="location.href='binafsi.html'">Binafsi</button>
+    <button onclick="location.href='muhimu.html'">MUHIMU</button>
+  </div>
+</div>
+
+<!-- Bank Logos -->
+<div class="bank-logos">
+  <img src="assets/nmb.png" alt="NMB Bank Logo" />
+  <img src="assets/crdb.png" alt="CRDB Bank Logo" />
+  <img src="assets/azania.png" alt="Azania Bank Logo" />
+  <img src="assets/exim.png" alt="Exim Bank Logo" />
+  <img src="assets/nbc.png" alt="NBC Bank Logo" />
+</div>
+
+<!-- Login Section -->
+<div class="login-banner">
+  <h2>KARIBU UPATE MKOPO NDANI YA MASAA 24</h2>
+  <p>Kupata mkopo chapchap, ingia au jiunge nasi.</p>
+  <div class="login-buttons">
+    <button id="login-btn" onclick="location.href='login.html'">Ingia</button>
+    <button id="signup-btn" onclick="location.href='signup.html'">Jiunge Nasi</button>
+  </div>
+</div>
+
+</body>
+</html>

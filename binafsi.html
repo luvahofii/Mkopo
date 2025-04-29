@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="sw">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mkopo Binafsi - MKOPO CHAPCHAP</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        /* Stili za Ziada kwa Ukurasa Huu */
+        .feature-card:nth-child(odd) {
+            background: linear-gradient(45deg, #ffffff, #f8f9fa);
+        }
+        
+        .feature-card:nth-child(even) {
+            background: linear-gradient(45deg, #f8f9fa, #ffffff);
+        }
+        
+        .icon.fa-wallet {
+            color: #27ae60;
+        }
+        
+        .icon.fa-hand-holding-heart {
+            color: #e74c3c;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <button class="home-btn" onclick="window.location.href='index.html'"><i class="fas fa-home"></i> Nyumbani</button>
+        <h1>MKOPO BINAFSI</h1>
+        <p>Kufikia Malengo Yako kwa Urahisi</p>
+    </div>
+
+    <div class="loan-details">
+        <div class="feature-card">
+            <i class="fas fa-wallet icon"></i>
+            <h2>Mikopo ya Haraka</h2>
+            <ul>
+                <li><i class="fas fa-check-circle"></i> Kiasi: TSh 100,000 - 3,000,000</li>
+                <li><i class="fas fa-check-circle"></i> Muda wa kulipa: Miezi 3-12</li>
+                <li><i class="fas fa-check-circle"></i> Riba 10% kwa mwaka</li>
+            </ul>
+        </div>
+
+        <div class="feature-card">
+            <i class="fas fa-hand-holding-heart icon"></i>
+            <h2>Faida za Ziada</h2>
+            <ul>
+                <li><i class="fas fa-check-circle"></i> Hakikishi wa dhamana</li>
+                <li><i class="fas fa-check-circle"></i> Uamuzi ndani ya dakika 30</li>
+                <li><i class="fas fa-check-circle"></i> Mfumo wa malipo rahisi</li>
+            </ul>
+        </div>
+    </div>
+        <!-- Jinsi ya Kutuma Maombi -->
+        <div class="feature-card">
+            <i class="fas fa-file-alt icon"></i>
+            <h2>Jinsi ya Kuomba</h2>
+            <ul>
+                <li><i class="fas fa-check-circle"></i> Jaza fomu ya baada ya kujiunga kwa urahisi</li>
+                <li><i class="fas fa-check-circle"></i> Ambatanisha nyaraka zako kupitia mfumo wetu salama</li>
+                <li><i class="fas fa-check-circle"></i> Utapokea uamuzi ndani ya saa 24</li>
+                <li><i class="fas fa-check-circle"></i> Pokea fedha zako moja kwa moja kwenye akaunti ya benki au namba ya simu</li>
+            </ul>
+        </div>
+    <div class="auth-buttons">
+        <button class="auth-btn login-btn" onclick="window.location.href='login.html'">Ingia</button>
+        <button class="auth-btn signup-btn" onclick="window.location.href='signup.html'">Jiunge Sasa</button>
+    </div>
+</body>
+</html>
