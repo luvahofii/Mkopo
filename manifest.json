@@ -1,12 +1,10 @@
 {
   "name": "Mkopo Chapchap",
-  "short_name": "Chapchap",
-  "start_url": "./index.html",
+  "short_name": "Mkopo",
+  "start_url": ".",
   "display": "standalone",
-  "background_color": "#e0f7fa",
-  "theme_color": "#0077b6",
-  "orientation": "portrait",
-  "scope": "./",
+  "background_color": "#ffffff",
+  "theme_color": "#00b4d8",
   "icons": [
     {
       "src": "icon-192.png",
