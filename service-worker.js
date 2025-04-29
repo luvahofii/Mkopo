@@ -2,19 +2,19 @@ const CACHE_NAME = "mkopo-chapchap-cache-v1";
 const urlsToCache = [
   "/",
   "/index.html",
-  "/assets/logo.png",
-  "/assets/favicon.png",
-  "/assets/airtel.png",
-  "/assets/vodacom.png",
-  "/assets/yas.png",
-  "/assets/halotel.png",
-  "/assets/nmb.png",
-  "/assets/crdb.png",
-  "/assets/azania.png",
-  "/assets/exim.png",
-  "/assets/nbc.png",
-  "/assets/icons/icon-192.png",
-  "/assets/icons/icon-512.png"
+  "/logo.png",
+  "/favicon.png",
+  "/airtel.png",
+  "/vodacom.png",
+  "/yas.png",
+  "/halotel.png",
+  "/nmb.png",
+  "/crdb.png",
+  "/azania.png",
+  "/exim.png",
+  "/nbc.png",
+  "/icon-192.png",
+  "/icon-512.png"
   // Add other critical files like CSS, JS, HTML
 ];
 
