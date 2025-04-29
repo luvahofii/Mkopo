@@ -6,10 +6,23 @@
   <title>Jiunge Nasi - MKOPO CHAPCHAP</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.10.5/dist/sweetalert2.min.css">
-  <!-- Added jsPDF script as requested -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <style>
-    /* STILI ZA MSINGI */
+    /* DEEP GLASSMORPHISM + NEUMORPHISM STYLING */
+    :root {
+      --primary: #3498db;
+      --primary-dark: #2980b9;
+      --success: #27ae60;
+      --success-dark: #219a52;
+      --error: #e74c3c;
+      --error-dark: #c0392b;
+      --text: #2c3e50;
+      --text-light: #7f8c8d;
+      --glass: rgba(255, 255, 255, 0.2);
+      --glass-border: rgba(255, 255, 255, 0.3);
+      --glass-shadow: rgba(0, 0, 0, 0.1);
+    }
+
     * {
       margin: 0;
       padding: 0;
@@ -18,62 +31,119 @@
     }
 
     body {
-      background: #3498db;
+      background: linear-gradient(135deg, #3498db, #2c3e50);
       min-height: 100vh;
       padding: 2rem;
+      display: flex;
+      justify-content: center;
+      align-items: center;
     }
 
     .form-container {
-      background: white;
-      border-radius: 15px;
-      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+      background: var(--glass);
+      backdrop-filter: blur(16px) saturate(180%);
+      -webkit-backdrop-filter: blur(16px) saturate(180%);
+      border-radius: 20px;
+      border: 1px solid var(--glass-border);
+      box-shadow: 
+        0 8px 32px 0 var(--glass-shadow),
+        20px 20px 40px -10px rgba(0, 0, 0, 0.2),
+        -5px -5px 10px rgba(255, 255, 255, 0.1);
       padding: 2rem;
       max-width: 800px;
+      width: 100%;
       margin: 0 auto;
       position: relative;
+      overflow: hidden;
+      z-index: 1;
+    }
+
+    .form-container::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 70%);
+      z-index: -1;
+      animation: rotate 20s linear infinite;
+    }
+
+    @keyframes rotate {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
     }
 
     .logo {
       display: block;
       margin: 0 auto 1.5rem auto;
       max-width: 150px;
+      filter: drop-shadow(0 5px 15px rgba(0,0,0,0.2));
+      transition: all 0.4s ease;
+    }
+
+    .logo:hover {
+      transform: scale(1.05);
+      filter: drop-shadow(0 8px 20px rgba(0,0,0,0.3));
     }
 
     .form-container h1 {
-      color: #2c3e50;
+      color: white;
       margin-bottom: 1.5rem;
       text-align: center;
+      text-shadow: 0 2px 5px rgba(0,0,0,0.2);
     }
 
     .form-container h2 {
-      color: #3498db;
+      color: white;
       margin-bottom: 1rem;
-      border-bottom: 2px solid #3498db;
+      border-bottom: 2px solid rgba(255,255,255,0.3);
       padding-bottom: 0.5rem;
+      text-shadow: 0 1px 3px rgba(0,0,0,0.2);
     }
 
     .form-container label {
       display: block;
       margin-bottom: 0.5rem;
-      color: #7f8c8d;
+      color: white;
+      text-shadow: 0 1px 2px rgba(0,0,0,0.2);
     }
 
     .form-container input,
     .form-container select,
     .form-container textarea {
       width: 100%;
-      padding: 12px;
+      padding: 14px;
       margin-bottom: 1.5rem;
-      border: 2px solid #ecf0f1;
-      border-radius: 8px;
-      transition: border-color 0.3s;
+      background: rgba(255, 255, 255, 0.15);
+      border: none;
+      border-radius: 12px;
+      color: white;
+      font-size: 1rem;
+      box-shadow: 
+        inset 4px 4px 8px rgba(0, 0, 0, 0.1),
+        inset -4px -4px 8px rgba(255, 255, 255, 0.1);
+      transition: all 0.3s;
+    }
+
+    .form-container input::placeholder,
+    .form-container select option:first-child {
+      color: rgba(255, 255, 255, 0.7);
+    }
+
+    .form-container select option {
+      color: var(--text);
     }
 
     .form-container input:focus,
     .form-container select:focus,
     .form-container textarea:focus {
-      border-color: #3498db;
       outline: none;
+      background: rgba(255, 255, 255, 0.25);
+      box-shadow: 
+        inset 4px 4px 8px rgba(0, 0, 0, 0.15),
+        inset -4px -4px 8px rgba(255, 255, 255, 0.1);
     }
 
     .form-container .name-boxes {
@@ -88,35 +158,56 @@
 
     .form-container button[type="submit"] {
       width: 100%;
-      padding: 12px;
-      background: linear-gradient(90deg, #27ae60, #219a52);
+      padding: 14px;
+      background: linear-gradient(135deg, var(--success), var(--success-dark));
       color: white;
       border: none;
-      border-radius: 8px;
+      border-radius: 12px;
       cursor: pointer;
       font-weight: bold;
       transition: all 0.3s;
+      box-shadow: 
+        6px 6px 12px rgba(0, 0, 0, 0.2),
+        -4px -4px 8px rgba(255, 255, 255, 0.1);
+      text-shadow: 0 1px 2px rgba(0,0,0,0.2);
     }
 
     .form-container button[type="submit"]:hover {
-      opacity: 0.9;
       transform: translateY(-2px);
+      box-shadow: 
+        8px 8px 16px rgba(0, 0, 0, 0.25),
+        -6px -6px 12px rgba(255, 255, 255, 0.1);
+    }
+
+    .form-container button[type="submit"]:active {
+      transform: translateY(0);
     }
 
     .home-btn {
       margin-top: 1rem;
       width: 100%;
-      padding: 10px;
-      background: #e74c3c;
+      padding: 12px;
+      background: linear-gradient(135deg, var(--error), var(--error-dark));
       color: white;
       border: none;
-      border-radius: 8px;
+      border-radius: 12px;
       cursor: pointer;
       transition: all 0.3s;
+      box-shadow: 
+        6px 6px 12px rgba(0, 0, 0, 0.2),
+        -4px -4px 8px rgba(255, 255, 255, 0.1);
+      text-shadow: 0 1px 2px rgba(0,0,0,0.2);
     }
 
     .home-btn:hover {
-      background: #c0392b;
+      transform: translateY(-2px);
+      box-shadow: 
+        8px 8px 16px rgba(0, 0, 0, 0.25),
+        -6px -6px 12px rgba(255, 255, 255, 0.1);
+    }
+
+    .home-btn:active {
+      transform: translateY(0);
     }
 
     .image-preview {
@@ -128,6 +219,8 @@
       max-width: 200px;
       border-radius: 10px;
       margin-top: 0.5rem;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+      border: 2px solid rgba(255,255,255,0.2);
     }
 
     .spinner-overlay {
@@ -135,18 +228,19 @@
       top: 0; left: 0;
       width: 100%;
       height: 100%;
-      background: rgba(255, 255, 255, 0.8);
+      background: rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(5px);
       display: flex;
       align-items: center;
       justify-content: center;
-      border-radius: 15px;
+      border-radius: 20px;
       display: none;
       z-index: 10;
     }
 
     .spinner {
-      border: 6px solid #f3f3f3;
-      border-top: 6px solid #3498db;
+      border: 6px solid rgba(255, 255, 255, 0.1);
+      border-top: 6px solid white;
       border-radius: 50%;
       width: 50px;
       height: 50px;
@@ -156,6 +250,78 @@
     @keyframes spin {
       0% { transform: rotate(0deg); }
       100% { transform: rotate(360deg); }
+    }
+
+    /* Floating bubbles background */
+    .bubbles {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+      overflow: hidden;
+    }
+
+    .bubble {
+      position: absolute;
+      bottom: -100px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 50%;
+      animation: rise 15s infinite ease-in;
+    }
+
+    .bubble:nth-child(1) {
+      width: 40px;
+      height: 40px;
+      left: 10%;
+      animation-duration: 8s;
+    }
+
+    .bubble:nth-child(2) {
+      width: 20px;
+      height: 20px;
+      left: 20%;
+      animation-duration: 5s;
+      animation-delay: 1s;
+    }
+
+    .bubble:nth-child(3) {
+      width: 50px;
+      height: 50px;
+      left: 35%;
+      animation-duration: 7s;
+      animation-delay: 2s;
+    }
+
+    .bubble:nth-child(4) {
+      width: 80px;
+      height: 80px;
+      left: 50%;
+      animation-duration: 11s;
+      animation-delay: 0s;
+    }
+
+    .bubble:nth-child(5) {
+      width: 35px;
+      height: 35px;
+      left: 55%;
+      animation-duration: 6s;
+      animation-delay: 1s;
+    }
+
+    @keyframes rise {
+      0% {
+        bottom: -100px;
+        transform: translateX(0);
+      }
+      50% {
+        transform: translateX(100px);
+      }
+      100% {
+        bottom: 1080px;
+        transform: translateX(-200px);
+      }
     }
 
     @media (max-width: 768px) {
@@ -175,311 +341,263 @@
   </style>
 </head>
 <body>
-
-<div class="form-container">
-  <img src="logo.png" alt="Logo" class="logo"> <!-- Add your logo here -->
-
-  <div class="spinner-overlay" id="spinnerOverlay">
-    <div class="spinner"></div>
+  <!-- Floating bubbles background -->
+  <div class="bubbles">
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
   </div>
 
-  <h1>Jiunge Nasi</h1>
+  <div class="form-container">
+    <img src="logo.png" alt="Logo" class="logo">
 
-  <form id="signupForm" onsubmit="signup(event)">
-    <!-- TAARIFA BINAFSI -->
-    <h2>TAARIFA BINAFSI</h2>
-    <div class="name-boxes">
-      <input type="text" id="firstName" placeholder="Jina la Kwanza" required>
-      <input type="text" id="middleName" placeholder="Jina la Kati" required>
-      <input type="text" id="lastName" placeholder="Jina la Mwisho" required>
+    <div class="spinner-overlay" id="spinnerOverlay">
+      <div class="spinner"></div>
     </div>
-    <input type="text" id="nida" placeholder="Namba ya NIDA" required>
-    <input type="text" id="phone" placeholder="Namba ya Simu" required>
-    <select id="mkoa" required>
-      <option value="">Chagua Mkoa</option>
-      <script>
-        const regions = ["Arusha", "Dar es Salaam", "Dodoma", "Geita", "Iringa", "Kagera", "Kaskazini Pemba", "Kaskazini Unguja", "Katavi", "Kigoma", "Kilimanjaro", "Kusini Pemba", "Kusini Unguja", "Lindi", "Manyara", "Mara", "Mbeya", "Mjini Magharibi", "Morogoro", "Mtwara", "Mwanza", "Njombe", "Pwani", "Rukwa", "Ruvuma", "Shinyanga", "Simiyu", "Singida", "Songwe", "Tabora", "Tanga"];
-        regions.forEach(region => {
-          document.write(`<option value="${region}">${region}</option>`);
-        });
-      </script>
-    </select>
-    <input type="text" id="wilaya" placeholder="Wilaya" required>
-    <input type="text" id="kata" placeholder="Kata" required>
-    <input type="text" id="mtaa" placeholder="Mtaa" required>
-    <input type="text" id="biashara" placeholder="Eneo la Biashara (kama ni mfanyabiashara)">
 
-    <!-- Additional photo input as requested -->
-    <label for="photo">Picha ya Profaili</label>
-    <input type="file" id="photo" accept="image/*" required>
+    <h1>Jiunge Nasi</h1>
 
-    <!-- MTU WA KARIBU -->
-    <h2>MTU WA KARIBU</h2>
-    <div class="name-boxes">
-      <input type="text" id="contactFirstName" placeholder="Jina la Kwanza" required>
-      <input type="text" id="contactMiddleName" placeholder="Jina la Kati" required>
-      <input type="text" id="contactLastName" placeholder="Jina la Mwisho" required>
-    </div>
-    <input type="text" id="contactPhone" placeholder="Namba ya Simu" required>
-    <select id="contactMkoa" required>
-      <option value="">Chagua Mkoa</option>
-      <script>
-        regions.forEach(region => {
-          document.write(`<option value="${region}">${region}</option>`);
-        });
-      </script>
-    </select>
-    <input type="text" id="contactWilaya" placeholder="Wilaya" required>
-    <input type="text" id="contactKata" placeholder="Kata" required>
-    <input type="text" id="contactMtaa" placeholder="Mtaa" required>
-    <input type="text" id="contactUhusiano" placeholder="Uhusiano" required>
+    <form id="signupForm">
+      <!-- TAARIFA BINAFSI -->
+      <h2>TAARIFA BINAFSI</h2>
+      <div class="name-boxes">
+        <input type="text" id="firstName" placeholder="Jina la Kwanza" required>
+        <input type="text" id="middleName" placeholder="Jina la Kati" required>
+        <input type="text" id="lastName" placeholder="Jina la Mwisho" required>
+      </div>
+      <input type="text" id="nida" placeholder="Namba ya NIDA" required>
+      <input type="tel" id="phone" placeholder="Namba ya Simu" required>
+      <select id="mkoa" required>
+        <option value="">Chagua Mkoa</option>
+        <option value="Arusha">Arusha</option>
+        <option value="Dar es Salaam">Dar es Salaam</option>
+        <option value="Dodoma">Dodoma</option>
+        <option value="Geita">Geita</option>
+        <option value="Iringa">Iringa</option>
+        <option value="Kagera">Kagera</option>
+        <option value="Kaskazini Pemba">Kaskazini Pemba</option>
+        <option value="Kaskazini Unguja">Kaskazini Unguja</option>
+        <option value="Katavi">Katavi</option>
+        <option value="Kigoma">Kigoma</option>
+        <option value="Kilimanjaro">Kilimanjaro</option>
+        <option value="Kusini Pemba">Kusini Pemba</option>
+        <option value="Kusini Unguja">Kusini Unguja</option>
+        <option value="Lindi">Lindi</option>
+        <option value="Manyara">Manyara</option>
+        <option value="Mara">Mara</option>
+        <option value="Mbeya">Mbeya</option>
+        <option value="Mjini Magharibi">Mjini Magharibi</option>
+        <option value="Morogoro">Morogoro</option>
+        <option value="Mtwara">Mtwara</option>
+        <option value="Mwanza">Mwanza</option>
+        <option value="Njombe">Njombe</option>
+        <option value="Pwani">Pwani</option>
+        <option value="Rukwa">Rukwa</option>
+        <option value="Ruvuma">Ruvuma</option>
+        <option value="Shinyanga">Shinyanga</option>
+        <option value="Simiyu">Simiyu</option>
+        <option value="Singida">Singida</option>
+        <option value="Songwe">Songwe</option>
+        <option value="Tabora">Tabora</option>
+        <option value="Tanga">Tanga</option>
+      </select>
+      <input type="text" id="wilaya" placeholder="Wilaya" required>
+      <input type="text" id="kata" placeholder="Kata" required>
+      <input type="text" id="mtaa" placeholder="Mtaa" required>
+      <input type="text" id="biashara" placeholder="Eneo la Biashara (kama ni mfanyabiashara)">
 
-    <!-- VIAMBATANISHO -->
-    <h2>VIAMBATANISHO</h2>
-    <label for="applicantPhoto">Picha ya Muombaji wa Mkopo</label>
-    <input type="file" id="applicantPhoto" accept="image/*" capture="environment" required onchange="previewImage(this, 'applicantPreview')">
-    <div class="image-preview" id="applicantPreview"></div>
+      <label for="photo">Picha ukiwa umeshika kitambulisho</label>
+      <input type="file" id="photo" accept="image/*" required>
 
-    <label for="nidaPhoto">Picha ya Kitambulisho cha NIDA</label>
-    <input type="file" id="nidaPhoto" accept="image/*" capture="environment" required onchange="previewImage(this, 'nidaPreview')">
-    <div class="image-preview" id="nidaPreview"></div>
+      <!-- MTU WA KARIBU -->
+      <h2>MTU WA KARIBU</h2>
+      <div class="name-boxes">
+        <input type="text" id="contactFirstName" placeholder="Jina la Kwanza" required>
+        <input type="text" id="contactMiddleName" placeholder="Jina la Kati" required>
+        <input type="text" id="contactLastName" placeholder="Jina la Mwisho" required>
+      </div>
+      <input type="tel" id="contactPhone" placeholder="Namba ya Simu" required>
+      <select id="contactMkoa" required>
+        <option value="">Chagua Mkoa</option>
+        <option value="Arusha">Arusha</option>
+        <option value="Dar es Salaam">Dar es Salaam</option>
+        <option value="Dodoma">Dodoma</option>
+        <option value="Geita">Geita</option>
+        <option value="Iringa">Iringa</option>
+        <option value="Kagera">Kagera</option>
+        <option value="Kaskazini Pemba">Kaskazini Pemba</option>
+        <option value="Kaskazini Unguja">Kaskazini Unguja</option>
+        <option value="Katavi">Katavi</option>
+        <option value="Kigoma">Kigoma</option>
+        <option value="Kilimanjaro">Kilimanjaro</option>
+        <option value="Kusini Pemba">Kusini Pemba</option>
+        <option value="Kusini Unguja">Kusini Unguja</option>
+        <option value="Lindi">Lindi</option>
+        <option value="Manyara">Manyara</option>
+        <option value="Mara">Mara</option>
+        <option value="Mbeya">Mbeya</option>
+        <option value="Mjini Magharibi">Mjini Magharibi</option>
+        <option value="Morogoro">Morogoro</option>
+        <option value="Mtwara">Mtwara</option>
+        <option value="Mwanza">Mwanza</option>
+        <option value="Njombe">Njombe</option>
+        <option value="Pwani">Pwani</option>
+        <option value="Rukwa">Rukwa</option>
+        <option value="Ruvuma">Ruvuma</option>
+        <option value="Shinyanga">Shinyanga</option>
+        <option value="Simiyu">Simiyu</option>
+        <option value="Singida">Singida</option>
+        <option value="Songwe">Songwe</option>
+        <option value="Tabora">Tabora</option>
+        <option value="Tanga">Tanga</option>
+      </select>
+      <input type="text" id="contactWilaya" placeholder="Wilaya" required>
+      <input type="text" id="contactKata" placeholder="Kata" required>
+      <input type="text" id="contactMtaa" placeholder="Mtaa" required>
+      <input type="text" id="contactUhusiano" placeholder="Uhusiano" required>
 
-    <button type="submit">Wasilisha Fomu</button>
-  </form>
+      <!-- VIAMBATANISHO -->
+      <h2>VIAMBATANISHO</h2>
+      <label for="applicantPhoto">Picha ya Muombaji wa Mkopo</label>
+      <input type="file" id="applicantPhoto" accept="image/*" required>
+      <div class="image-preview" id="applicantPreview"></div>
 
-  <button class="home-btn" onclick="window.location.href='index.html'">Nyumbani 🏠</button>
-</div>
+      <label for="nidaPhoto">Picha ya Kitambulisho cha NIDA</label>
+      <input type="file" id="nidaPhoto" accept="image/*" required>
+      <div class="image-preview" id="nidaPreview"></div>
 
-<!-- Updated JavaScript section as requested -->
-<script src="https://cdn.backendless.com/sdk/js/latest/backendless.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<script>
-  Backendless.initApp('52CCEB97-D67E-42BA-BABE-55ACD1CE7970', '8C78F96A-9B54-419D-B353-7FFA41C0001F');
+      <button type="submit">Wasilisha Fomu</button>
+    </form>
 
-  async function signup(event) {
-    event.preventDefault();
-    const spinner = document.getElementById('spinnerOverlay');
-    spinner.style.display = 'flex'; // Show spinner
-const formData = {
-  firstName: document.getElementById('firstName').value,
-  middleName: document.getElementById('middleName').value,
-  lastName: document.getElementById('lastName').value,
-  phone: document.getElementById('phone').value,
-  nida: document.getElementById('nida').value,
-  region: document.getElementById('region').value,
-  district: document.getElementById('district').value,
-  ward: document.getElementById('ward').value,
-  photoBase64: capturedPhotoDataURL // if you're capturing photo
-};
+    <button class="home-btn" onclick="window.location.href='index.html'">Nyumbani 🏠</button>
+  </div>
 
-// Combine full name
-formData.fullName = `${formData.firstName} ${formData.middleName} ${formData.lastName}`.trim();
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script>
+    // Form submission handler
+    document.getElementById('signupForm').addEventListener('submit', async function(event) {
+      event.preventDefault();
+      const spinner = document.getElementById('spinnerOverlay');
+      spinner.style.display = 'flex';
 
-// Save to localStorage
-localStorage.setItem('signupData', JSON.stringify(formData));
-    // Collect form data
-    const user = {
-      nida: document.getElementById('nida').value,
-      phone: document.getElementById('phone').value,
-      firstName: document.getElementById('firstName').value,
-      middleName: document.getElementById('middleName').value,
-      lastName: document.getElementById('lastName').value,
-      mkoa: document.getElementById('mkoa').value,
-      wilaya: document.getElementById('wilaya').value,
-      kata: document.getElementById('kata').value,
-      mtaa: document.getElementById('mtaa').value,
-      biashara: document.getElementById('biashara').value,
-      contactFirstName: document.getElementById('contactFirstName').value,
-      contactMiddleName: document.getElementById('contactMiddleName').value,
-      contactLastName: document.getElementById('contactLastName').value,
-      contactPhone: document.getElementById('contactPhone').value,
-      contactMkoa: document.getElementById('contactMkoa').value,
-      contactWilaya: document.getElementById('contactWilaya').value,
-      contactKata: document.getElementById('contactKata').value,
-      contactMtaa: document.getElementById('contactMtaa').value,
-      contactUhusiano: document.getElementById('contactUhusiano').value
-    };
+      try {
+        // Collect form data
+        const formData = {
+          firstName: document.getElementById('firstName').value.trim(),
+          middleName: document.getElementById('middleName').value.trim(),
+          lastName: document.getElementById('lastName').value.trim(),
+          nida: document.getElementById('nida').value.trim(),
+          phone: document.getElementById('phone').value.trim(),
+          mkoa: document.getElementById('mkoa').value,
+          wilaya: document.getElementById('wilaya').value.trim(),
+          kata: document.getElementById('kata').value.trim(),
+          mtaa: document.getElementById('mtaa').value.trim(),
+          biashara: document.getElementById('biashara').value.trim(),
+          contactFirstName: document.getElementById('contactFirstName').value.trim(),
+          contactMiddleName: document.getElementById('contactMiddleName').value.trim(),
+          contactLastName: document.getElementById('contactLastName').value.trim(),
+          contactPhone: document.getElementById('contactPhone').value.trim(),
+          contactMkoa: document.getElementById('contactMkoa').value,
+          contactWilaya: document.getElementById('contactWilaya').value.trim(),
+          contactKata: document.getElementById('contactKata').value.trim(),
+          contactMtaa: document.getElementById('contactMtaa').value.trim(),
+          contactUhusiano: document.getElementById('contactUhusiano').value.trim(),
+          timestamp: new Date().toISOString()
+        };
 
-    // Backendless registration
-    const backendlessUser = {
-      email: user.phone,
-      password: user.nida,
-      firstName: user.firstName,
-      middleName: user.middleName,
-      lastName: user.lastName,
-      phone: user.phone,
-      mkoa: user.mkoa,
-      wilaya: user.wilaya,
-      kata: user.kata,
-      mtaa: user.mtaa,
-      biashara: user.biashara
-    };
+        // Validate phone numbers
+        if (!/^0[67]\d{8}$/.test(formData.phone)) {
+          throw new Error('Namba ya simu sio sahihi. Tafadhali ingiza namba ya Airtel, Tigo, Halotel au Vodacom.');
+        }
 
-    try {
-      await Backendless.UserService.register(backendlessUser);
+        if (!/^0[67]\d{8}$/.test(formData.contactPhone)) {
+          throw new Error('Namba ya simu ya mtu wa karibu sio sahihi.');
+        }
 
-      // Save to localStorage
-      localStorage.setItem('userInfo', JSON.stringify(user));
-      localStorage.setItem('nida', user.nida);
-      localStorage.setItem('password', user.phone);
+        // Validate NIDA number (basic check for 20 digits)
+        if (!/^\d{20}$/.test(formData.nida)) {
+          throw new Error('Namba ya NIDA sio sahihi. Namba ya NIDA inapaswa kuwa na tarakimu 20.');
+        }
 
-      // Generate and store PDF
-      const { jsPDF } = window.jspdf;
-      const doc = new jsPDF();
-      doc.setFontSize(12);
-      doc.text("TAARIFA YA MWOMBAJI", 10, 10);
-      
-      // Personal Information Section
-      doc.setFontSize(10);
-      doc.text("TAARIFA BINAFSI", 10, 20);
-      doc.text(`Jina Kamili: ${user.firstName} ${user.middleName} ${user.lastName}`, 10, 30);
-      doc.text(`NIDA: ${user.nida}`, 10, 40);
-      doc.text(`Simu: ${user.phone}`, 10, 50);
-      doc.text(`Mkoa: ${user.mkoa}`, 10, 60);
-      doc.text(`Wilaya: ${user.wilaya}`, 10, 70);
-      doc.text(`Kata: ${user.kata}`, 10, 80);
-      doc.text(`Mtaa: ${user.mtaa}`, 10, 90);
-      doc.text(`Eneo la Biashara: ${user.biashara || 'Hakuna'}`, 10, 100);
-      
-      // Emergency Contact Section
-      doc.text("MTU WA KARIBU", 10, 115);
-      doc.text(`Jina: ${user.contactFirstName} ${user.contactMiddleName} ${user.contactLastName}`, 10, 125);
-      doc.text(`Simu: ${user.contactPhone}`, 10, 135);
-      doc.text(`Uhusiano: ${user.contactUhusiano}`, 10, 145);
-      doc.text(`Mkoa: ${user.contactMkoa}`, 10, 155);
-      doc.text(`Wilaya: ${user.contactWilaya}`, 10, 165);
-      doc.text(`Kata: ${user.contactKata}`, 10, 175);
-      doc.text(`Mtaa: ${user.contactMtaa}`, 10, 185);
+        // Process images and save to localStorage
+        const processImage = (fileInputId) => {
+          return new Promise((resolve) => {
+            const fileInput = document.getElementById(fileInputId);
+            if (fileInput.files && fileInput.files[0]) {
+              const reader = new FileReader();
+              reader.onload = function(e) {
+                localStorage.setItem(fileInputId, e.target.result);
+                resolve(e.target.result);
+              };
+              reader.readAsDataURL(fileInput.files[0]);
+            } else {
+              resolve(null);
+            }
+          });
+        };
 
-      // Add date and signature fields
-      doc.text("Saini ya Mwombaji: _________________________", 10, 200);
-      doc.text("Tarehe: _________________________", 10, 210);
+        // Save all images to localStorage
+        await processImage('photo');
+        await processImage('applicantPhoto');
+        await processImage('nidaPhoto');
 
-      const pdfBlob = doc.output("blob");
-      const reader = new FileReader();
-      reader.onloadend = function() {
-        const base64data = reader.result;
-        localStorage.setItem("formPDF", base64data);
+        // Generate PDF
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
         
-        // Show success message with download option
-        Swal.fire({
-          icon: 'success',
+        doc.setFontSize(16);
+        doc.setTextColor(40, 40, 40);
+        doc.text("TAARIFA YA MWOMBAJI WA MKOPO", 105, 15, null, null, 'center');
+        
+        doc.setFontSize(12);
+        doc.text("TAARIFA BINAFSI", 14, 25);
+        doc.text(`Jina Kamili: ${formData.firstName} ${formData.middleName} ${formData.lastName}`, 14, 35);
+        doc.text(`Namba ya NIDA: ${formData.nida}`, 14, 45);
+        doc.text(`Namba ya Simu: ${formData.phone}`, 14, 55);
+        doc.text(`Anuani: ${formData.mtaa}, ${formData.kata}, ${formData.wilaya}, ${formData.mkoa}`, 14, 65);
+        doc.text(`Eneo la Biashara: ${formData.biashara || 'Hakuna'}`, 14, 75);
+        
+        doc.text("MTU WA KARIBU", 14, 90);
+        doc.text(`Jina: ${formData.contactFirstName} ${formData.contactMiddleName} ${formData.contactLastName}`, 14, 100);
+        doc.text(`Uhusiano: ${formData.contactUhusiano}`, 14, 110);
+        doc.text(`Simu: ${formData.contactPhone}`, 14, 120);
+        doc.text(`Anuani: ${formData.contactMtaa}, ${formData.contactKata}, ${formData.contactWilaya}, ${formData.contactMkoa}`, 14, 130);
+        
+        doc.text("VIAMBATANISHO", 14, 145);
+        doc.text(`Picha ya Profaili: Imetumwa`, 14, 155);
+        doc.text(`Picha ya Muombaji: Imetumwa`, 14, 165);
+        doc.text(`Picha ya NIDA: Imetumwa`, 14, 175);
+        
+        doc.text("Saini ya Mwombaji: _________________________", 14, 190);
+        doc.text("Tarehe: _________________________", 14, 200);
+        
+        const pdfBlob = doc.output('blob');
+        const pdfUrl = URL.createObjectURL(pdfBlob);
+        
+        // Store all data in localStorage
+        localStorage.setItem('mkopoChapChapUserData', JSON.stringify(formData));
+        localStorage.setItem('mkopoChapChapPDF', pdfUrl);
+
+        // Show success message
+        await Swal.fire({
           title: 'Hongera!',
-          html: 'Usajili umefanikiwa na taarifa zimehifadhiwa!<br><br><button onclick="downloadPDF()" style="background:#27ae60;color:white;border:none;padding:10px 20px;border-radius:5px;cursor:pointer">Pakua PDF</button>',
-          confirmButtonColor: '#27ae60',
-          showCancelButton: true,
-          cancelButtonText: 'Funga',
-          showConfirmButton: false
+          text: 'Umefanikiwa kujiunga na mfumo wa Mkopo ChapChap',
+          icon: 'success',
+          confirmButtonText: 'Endelea',
+          background: 'rgba(255, 255, 255, 0.9)',
+          backdrop: 'rgba(0, 0, 0, 0.5)',
+          willClose: () => {
+            window.location.href = 'profile.html';
+          }
         });
-      };
-      reader.readAsDataURL(pdfBlob);
 
-      document.getElementById('signupForm').reset();
-      document.getElementById('applicantPreview').innerHTML = '';
-      document.getElementById('nidaPreview').innerHTML = '';
-    } catch (error) {
-      Swal.fire({
-        icon: 'error',
-        title: 'Imeshindikana!',
-        text: error.message,
-        confirmButtonColor: '#e74c3c'
-      });
-    } finally {
-      spinner.style.display = 'none'; // Hide spinner
-    }
-  }
-
-  function downloadPDF() {
-    const pdfData = localStorage.getItem("formPDF");
-    if (pdfData) {
-      const link = document.createElement('a');
-      link.href = pdfData;
-      link.download = 'MkopoChapChap_Application.pdf';
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-    } else {
-      Swal.fire({
-        icon: 'error',
-        title: 'Hitilafu',
-        text: 'Hakuna faili ya PDF iliyohifadhiwa',
-        confirmButtonColor: '#e74c3c'
-      });
-    }
-  }
-
-  function previewImage(input, previewId) {
-    const preview = document.getElementById(previewId);
-    preview.innerHTML = '';
-    if (input.files && input.files[0]) {
-      const reader = new FileReader();
-      reader.onload = function (e) {
-        const img = document.createElement('img');
-        img.src = e.target.result;
-        preview.appendChild(img);
-        
-        // Store image in localStorage
-        localStorage.setItem(previewId, e.target.result);
-      };
-      reader.readAsDataURL(input.files[0]);
-    }
-  }
-
-  // Load saved images on page load
-  window.addEventListener('DOMContentLoaded', () => {
-    const applicantPreview = localStorage.getItem('applicantPreview');
-    const nidaPreview = localStorage.getItem('nidaPreview');
-    
-    if (applicantPreview) {
-      const img = document.createElement('img');
-      img.src = applicantPreview;
-      document.getElementById('applicantPreview').appendChild(img);
-    }
-    
-    if (nidaPreview) {
-      const img = document.createElement('img');
-      img.src = nidaPreview;
-      document.getElementById('nidaPreview').appendChild(img);
-    }
-  });
-
-  // Added registerUser function as requested
-  function registerUser() {
-    const fileInput = document.getElementById('photo');
-    const file = fileInput.files[0];
-
-    if (!file) {
-      alert('Tafadhali chagua picha.');
-      return;
-    }
-
-    const reader = new FileReader();
-    reader.onloadend = function () {
-      const photoBase64 = reader.result;
-
-      const formData = {
-        firstName: document.getElementById('firstName').value,
-        middleName: document.getElementById('middleName').value,
-        lastName: document.getElementById('lastName').value,
-        phone: document.getElementById('phone').value,
-        nida: document.getElementById('nida').value,
-        region: document.getElementById('mkoa').value,
-        district: document.getElementById('wilaya').value,
-        ward: document.getElementById('kata').value,
-        photoBase64: photoBase64
-      };
-
-      formData.fullName = `${formData.firstName} ${formData.middleName} ${formData.lastName}`.trim();
-
-      localStorage.setItem('signupData', JSON.stringify(formData));
-
-      alert('Taarifa zimehifadhiwa kwa mafanikio!');
-      window.location.href = 'akaunti.html'; // Unaweza kuelekeza popote unapotaka
-    };
-
-    reader.readAsDataURL(file);
-  }
-</script>
-
-</body>
-</html>
+      } catch (error) {
+        console.error('Error during registration:', error);
+        Swal.fire({
+          title: 'Hitilafu',
+          text: error.message || 'Kumetokea hitilafu wakati wa kujiunga. Tafadhali jaribu tena.',
+          icon: 'error',
+          confirmButtonText: 'Sawa',
+          background
