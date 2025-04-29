@@ -104,7 +104,7 @@
   </style>
 </head>
 <body>
-  <img class="logo" src="assets/logo.png" alt="MKOPO CHAPCHAP Logo" />
+  <img class="logo" src="logo.png" alt="MKOPO CHAPCHAP Logo" />
 
   <div class="profile-banner">
     <img id="profilePic" src="default_image.jpg" alt="Picha ya Profaili"/>
@@ -123,17 +123,27 @@
 
   <script>
     // Load user from localStorage
-    const loggedUser = JSON.parse(localStorage.getItem("loggedInUser"));
+    document.addEventListener('DOMContentLoaded', function() {
+      const userData = JSON.parse(localStorage.getItem('mkopoChapChapUserData'));
+      const profilePhoto = localStorage.getItem('photo');
 
-    if (loggedUser) {
-      document.getElementById('profileName').textContent = loggedUser.fullName || 'Guest';
-      document.getElementById('profilePhone').textContent = `Simu: ${loggedUser.phone || 'Not provided'}`;
-      document.getElementById('profileNida').textContent = `NIDA: ${loggedUser.nida || 'Not provided'}`;
-      document.getElementById('profilePic').src = loggedUser.profilePicture || 'default_image.jpg';
-    } else {
-      alert("Tafadhali ingia kwanza.");
-      window.location.href = 'index.html';
-    }
+      if (userData) {
+        // Set profile information
+        document.getElementById('profileName').textContent = 
+          `${userData.firstName || ''} ${userData.middleName || ''} ${userData.lastName || ''}`.trim() || 'Guest';
+        
+        document.getElementById('profilePhone').textContent = `Simu: ${userData.phone || 'Not provided'}`;
+        document.getElementById('profileNida').textContent = `NIDA: ${userData.nida || 'Not provided'}`;
+        
+        // Set profile photo if available
+        if (profilePhoto) {
+          document.getElementById('profilePic').src = profilePhoto;
+        }
+      } else {
+        alert("Tafadhali ingia kwanza.");
+        window.location.href = 'login.html';
+      }
+    });
   </script>
 </body>
 </html>
