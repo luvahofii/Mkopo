@@ -344,8 +344,8 @@
       </div>
       
       <div class="form-group">
-        <label for="nida">Namba ya NIDA:</label>
-        <input type="password" id="nida" placeholder="Namba ya NIDA (tarakimu 20)" required>
+        <label for="password">Nenosiri:</label>
+        <input type="password" id="password" placeholder="Namba sita za mwisho za NIDA" required>
       </div>
       
       <div class="spinner" id="spinner"></div>
@@ -368,10 +368,14 @@
       
       const spinner = document.getElementById('spinner');
       const phone = document.getElementById('phone').value.trim();
-      const nida = document.getElementById('nida').value.trim();
+      const password = document.getElementById('password').value.trim();
+      
+      // Show loading spinner
+      spinner.style.display = 'block';
       
       // Validate phone number format
       if (!/^0[67]\d{8}$/.test(phone)) {
+        spinner.style.display = 'none';
         Swal.fire({
           title: 'Hitilafu',
           text: 'Tafadhali ingiza namba ya simu sahihi (Airtel, Tigo, Halotel au Vodacom)',
@@ -382,11 +386,12 @@
         return;
       }
       
-      // Validate NIDA format (20 digits)
-      if (!/^\d{20}$/.test(nida)) {
+      // Check if password is provided
+      if (!password) {
+        spinner.style.display = 'none';
         Swal.fire({
           title: 'Hitilafu',
-          text: 'Namba ya NIDA inapaswa kuwa na tarakimu 20',
+          text: 'Tafadhali ingiza nenosiri lako',
           icon: 'error',
           background: 'rgba(255, 255, 255, 0.9)',
           backdrop: 'rgba(0, 0, 0, 0.5)'
@@ -394,18 +399,18 @@
         return;
       }
       
-      spinner.style.display = 'block';
-      
-      // Check user in localStorage
+      // Simulate network delay
       setTimeout(() => {
-        const userData = localStorage.getItem(`mkopo_user_${phone}`);
+        // Check user in localStorage
+        const users = JSON.parse(localStorage.getItem('mkopoChapChapUsers')) || [];
+        const user = users.find(u => u.phone === phone);
         
-        if (userData) {
-          const user = JSON.parse(userData);
-          
-          if (user.nida === nida) {
+        if (user) {
+          // Check password (last 6 digits of NIDA)
+          if (user.password === password) {
             // Successful login
             localStorage.setItem('currentUser', JSON.stringify(user));
+            localStorage.setItem('lastUserPhone', phone);
             spinner.style.display = 'none';
             
             Swal.fire({
@@ -422,7 +427,7 @@
             spinner.style.display = 'none';
             Swal.fire({
               title: 'Hitilafu',
-              text: 'Namba ya NIDA sio sahihi',
+              text: 'Nenosiri sio sahihi',
               icon: 'error',
               background: 'rgba(255, 255, 255, 0.9)',
               backdrop: 'rgba(0, 0, 0, 0.5)'
@@ -453,7 +458,7 @@
       const lastUserPhone = localStorage.getItem('lastUserPhone');
       if (lastUserPhone) {
         document.getElementById('phone').value = lastUserPhone;
-        document.getElementById('nida').focus();
+        document.getElementById('password').focus();
       }
     });
   </script>
