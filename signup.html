@@ -217,10 +217,12 @@
 
     .image-preview img {
       max-width: 200px;
+      max-height: 200px;
       border-radius: 10px;
       margin-top: 0.5rem;
       box-shadow: 0 5px 15px rgba(0,0,0,0.2);
       border: 2px solid rgba(255,255,255,0.2);
+      object-fit: contain;
     }
 
     .spinner-overlay {
@@ -324,6 +326,20 @@
       }
     }
 
+    /* Form validation styles */
+    .error-message {
+      color: #ffcccc;
+      font-size: 0.8rem;
+      margin-top: -1rem;
+      margin-bottom: 1rem;
+      display: none;
+    }
+
+    .input-error {
+      border: 1px solid var(--error) !important;
+      box-shadow: 0 0 5px rgba(231, 76, 60, 0.5) !important;
+    }
+
     @media (max-width: 768px) {
       body {
         padding: 1rem;
@@ -363,15 +379,34 @@
       <!-- TAARIFA BINAFSI -->
       <h2>TAARIFA BINAFSI</h2>
       <div class="name-boxes">
-        <input type="text" id="firstName" placeholder="Jina la Kwanza" required>
-        <input type="text" id="middleName" placeholder="Jina la Kati" required>
-        <input type="text" id="lastName" placeholder="Jina la Mwisho" required>
+        <div class="name-input">
+          <input type="text" id="firstName" placeholder="Jina la Kwanza" required>
+          <div class="error-message" id="firstNameError">Tafadhali jaza jina la kwanza</div>
+        </div>
+        <div class="name-input">
+          <input type="text" id="middleName" placeholder="Jina la Kati" required>
+          <div class="error-message" id="middleNameError">Tafadhali jaza jina la kati</div>
+        </div>
+        <div class="name-input">
+          <input type="text" id="lastName" placeholder="Jina la Mwisho" required>
+          <div class="error-message" id="lastNameError">Tafadhali jaza jina la mwisho</div>
+        </div>
       </div>
-      <input type="text" id="nida" placeholder="Namba ya NIDA" required>
-      <input type="tel" id="phone" placeholder="Namba ya Simu" required>
-      <select id="mkoa" required>
-        <option value="">Chagua Mkoa</option>
-        <option value="Arusha">Arusha</option>
+      
+      <div class="input-group">
+        <input type="text" id="nida" placeholder="Namba ya NIDA" required>
+        <div class="error-message" id="nidaError">Namba ya NIDA inapaswa kuwa na tarakimu 20</div>
+      </div>
+      
+      <div class="input-group">
+        <input type="tel" id="phone" placeholder="Namba ya Simu" required>
+        <div class="error-message" id="phoneError">Ingiza namba ya simu sahihi (07/06...) na tarakimu 10</div>
+      </div>
+      
+      <div class="input-group">
+        <select id="mkoa" required>
+      <option value="">Chagua Mkoa</option>
+          <option value="Arusha">Arusha</option>
         <option value="Dar es Salaam">Dar es Salaam</option>
         <option value="Dodoma">Dodoma</option>
         <option value="Geita">Geita</option>
@@ -402,26 +437,61 @@
         <option value="Songwe">Songwe</option>
         <option value="Tabora">Tabora</option>
         <option value="Tanga">Tanga</option>
-      </select>
-      <input type="text" id="wilaya" placeholder="Wilaya" required>
-      <input type="text" id="kata" placeholder="Kata" required>
-      <input type="text" id="mtaa" placeholder="Mtaa" required>
+          <!-- Other regions... -->
+        </select>
+        <div class="error-message" id="mkoaError">Tafadhali chagua mkoa</div>
+      </div>
+      
+      <div class="input-group">
+        <input type="text" id="wilaya" placeholder="Wilaya" required>
+        <div class="error-message" id="wilayaError">Tafadhali jaza wilaya</div>
+      </div>
+      
+      <div class="input-group">
+        <input type="text" id="kata" placeholder="Kata" required>
+        <div class="error-message" id="kataError">Tafadhali jaza kata</div>
+      </div>
+      
+      <div class="input-group">
+        <input type="text" id="mtaa" placeholder="Mtaa" required>
+        <div class="error-message" id="mtaaError">Tafadhali jaza mtaa</div>
+      </div>
+      
       <input type="text" id="biashara" placeholder="Eneo la Biashara (kama ni mfanyabiashara)">
 
-      <label for="photo">Picha ukiwa umeshika kitambulisho</label>
-      <input type="file" id="photo" accept="image/*" required>
+      <div class="input-group">
+        <label for="photo">Picha ukiwa umeshika kitambulisho</label>
+        <input type="file" id="photo" accept="image/*" required>
+        <div class="error-message" id="photoError">Tafadhali pakia picha</div>
+        <div class="image-preview" id="photoPreview"></div>
+      </div>
 
       <!-- MTU WA KARIBU -->
       <h2>MTU WA KARIBU</h2>
       <div class="name-boxes">
-        <input type="text" id="contactFirstName" placeholder="Jina la Kwanza" required>
-        <input type="text" id="contactMiddleName" placeholder="Jina la Kati" required>
-        <input type="text" id="contactLastName" placeholder="Jina la Mwisho" required>
+        <div class="name-input">
+          <input type="text" id="contactFirstName" placeholder="Jina la Kwanza" required>
+          <div class="error-message" id="contactFirstNameError">Tafadhali jaza jina la kwanza</div>
+        </div>
+        <div class="name-input">
+          <input type="text" id="contactMiddleName" placeholder="Jina la Kati" required>
+          <div class="error-message" id="contactMiddleNameError">Tafadhali jaza jina la kati</div>
+        </div>
+        <div class="name-input">
+          <input type="text" id="contactLastName" placeholder="Jina la Mwisho" required>
+          <div class="error-message" id="contactLastNameError">Tafadhali jaza jina la mwisho</div>
+        </div>
       </div>
-      <input type="tel" id="contactPhone" placeholder="Namba ya Simu" required>
-      <select id="contactMkoa" required>
-        <option value="">Chagua Mkoa</option>
-        <option value="Arusha">Arusha</option>
+      
+      <div class="input-group">
+        <input type="tel" id="contactPhone" placeholder="Namba ya Simu" required>
+        <div class="error-message" id="contactPhoneError">Ingiza namba ya simu sahihi (07/06...) na tarakimu 10</div>
+      </div>
+      
+      <div class="input-group">
+        <select id="contactMkoa" required>
+          <option value="">Chagua Mkoa</option>
+          <option value="Arusha">Arusha</option>
         <option value="Dar es Salaam">Dar es Salaam</option>
         <option value="Dodoma">Dodoma</option>
         <option value="Geita">Geita</option>
@@ -452,21 +522,46 @@
         <option value="Songwe">Songwe</option>
         <option value="Tabora">Tabora</option>
         <option value="Tanga">Tanga</option>
-      </select>
-      <input type="text" id="contactWilaya" placeholder="Wilaya" required>
-      <input type="text" id="contactKata" placeholder="Kata" required>
-      <input type="text" id="contactMtaa" placeholder="Mtaa" required>
-      <input type="text" id="contactUhusiano" placeholder="Uhusiano" required>
+          <!-- Other regions... -->
+        </select>
+        <div class="error-message" id="contactMkoaError">Tafadhali chagua mkoa</div>
+      </div>
+      
+      <div class="input-group">
+        <input type="text" id="contactWilaya" placeholder="Wilaya" required>
+        <div class="error-message" id="contactWilayaError">Tafadhali jaza wilaya</div>
+      </div>
+      
+      <div class="input-group">
+        <input type="text" id="contactKata" placeholder="Kata" required>
+        <div class="error-message" id="contactKataError">Tafadhali jaza kata</div>
+      </div>
+      
+      <div class="input-group">
+        <input type="text" id="contactMtaa" placeholder="Mtaa" required>
+        <div class="error-message" id="contactMtaaError">Tafadhali jaza mtaa</div>
+      </div>
+      
+      <div class="input-group">
+        <input type="text" id="contactUhusiano" placeholder="Uhusiano" required>
+        <div class="error-message" id="contactUhusianoError">Tafadhali jaza uhusiano</div>
+      </div>
 
       <!-- VIAMBATANISHO -->
       <h2>VIAMBATANISHO</h2>
-      <label for="applicantPhoto">Picha ya Muombaji wa Mkopo</label>
-      <input type="file" id="applicantPhoto" accept="image/*" required>
-      <div class="image-preview" id="applicantPreview"></div>
+      <div class="input-group">
+        <label for="applicantPhoto">Picha ya Muombaji wa Mkopo</label>
+        <input type="file" id="applicantPhoto" accept="image/*" required>
+        <div class="error-message" id="applicantPhotoError">Tafadhali pakia picha</div>
+        <div class="image-preview" id="applicantPreview"></div>
+      </div>
 
-      <label for="nidaPhoto">Picha ya Kitambulisho cha NIDA</label>
-      <input type="file" id="nidaPhoto" accept="image/*" required>
-      <div class="image-preview" id="nidaPreview"></div>
+      <div class="input-group">
+        <label for="nidaPhoto">Picha ya Kitambulisho cha NIDA</label>
+        <input type="file" id="nidaPhoto" accept="image/*" required>
+        <div class="error-message" id="nidaPhotoError">Tafadhali pakia picha ya NIDA</div>
+        <div class="image-preview" id="nidaPreview"></div>
+      </div>
 
       <button type="submit">Wasilisha Fomu</button>
     </form>
@@ -476,128 +571,74 @@
 
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script>
-    // Form submission handler
-    document.getElementById('signupForm').addEventListener('submit', async function(event) {
+    // Initialize jsPDF
+    const { jsPDF } = window.jspdf;
+    
+    // DOM Elements
+    const form = document.getElementById('signupForm');
+    const spinner = document.getElementById('spinnerOverlay');
+    
+    // Error messages in Swahili
+    const errorMessages = {
+      required: 'Sehemu hii inahitajika',
+      phone: 'Namba ya simu sio sahihi. Ingiza namba ya Airtel, Tigo, Halotel au Vodacom.',
+      nida: 'Namba ya NIDA inapaswa kuwa na tarakimu 20',
+      image: 'Tafadhali pakia picha'
+    };
+    
+    // Real-time validation
+    document.getElementById('phone').addEventListener('input', function() {
+      validatePhone(this);
+    });
+    
+    document.getElementById('contactPhone').addEventListener('input', function() {
+      validatePhone(this, 'contactPhoneError');
+    });
+    
+    document.getElementById('nida').addEventListener('input', function() {
+      validateNIDA(this);
+    });
+    
+    // Image preview handlers
+    document.getElementById('applicantPhoto').addEventListener('change', function(e) {
+      previewImage(e.target, 'applicantPreview');
+    });
+    
+    document.getElementById('nidaPhoto').addEventListener('change', function(e) {
+      previewImage(e.target, 'nidaPreview');
+    });
+    
+    document.getElementById('photo').addEventListener('change', function(e) {
+      previewImage(e.target, 'photoPreview');
+    });
+    
+    // Form submission
+    form.addEventListener('submit', async function(event) {
       event.preventDefault();
-      const spinner = document.getElementById('spinnerOverlay');
+      
+      // Validate all fields before submission
+      if (!validateForm()) {
+        return;
+      }
+      
       spinner.style.display = 'flex';
-
+      
       try {
         // Collect form data
-        const formData = {
-          firstName: document.getElementById('firstName').value.trim(),
-          middleName: document.getElementById('middleName').value.trim(),
-          lastName: document.getElementById('lastName').value.trim(),
-          nida: document.getElementById('nida').value.trim(),
-          phone: document.getElementById('phone').value.trim(),
-          mkoa: document.getElementById('mkoa').value,
-          wilaya: document.getElementById('wilaya').value.trim(),
-          kata: document.getElementById('kata').value.trim(),
-          mtaa: document.getElementById('mtaa').value.trim(),
-          biashara: document.getElementById('biashara').value.trim(),
-          contactFirstName: document.getElementById('contactFirstName').value.trim(),
-          contactMiddleName: document.getElementById('contactMiddleName').value.trim(),
-          contactLastName: document.getElementById('contactLastName').value.trim(),
-          contactPhone: document.getElementById('contactPhone').value.trim(),
-          contactMkoa: document.getElementById('contactMkoa').value,
-          contactWilaya: document.getElementById('contactWilaya').value.trim(),
-          contactKata: document.getElementById('contactKata').value.trim(),
-          contactMtaa: document.getElementById('contactMtaa').value.trim(),
-          contactUhusiano: document.getElementById('contactUhusiano').value.trim(),
-          timestamp: new Date().toISOString()
-        };
-
+        const formData = collectFormData();
+        
         // Validate phone numbers
-        if (!/^0[67]\d{8}$/.test(formData.phone)) {
-          throw new Error('Namba ya simu sio sahihi. Tafadhali ingiza namba ya Airtel, Tigo, Halotel au Vodacom.');
-        }
-
-        if (!/^0[67]\d{8}$/.test(formData.contactPhone)) {
-          throw new Error('Namba ya simu ya mtu wa karibu sio sahihi.');
-        }
-
-        // Validate NIDA number (basic check for 20 digits)
-        if (!/^\d{20}$/.test(formData.nida)) {
-          throw new Error('Namba ya NIDA sio sahihi. Namba ya NIDA inapaswa kuwa na tarakimu 20.');
-        }
-
-        // Process images and save to localStorage
-        const processImage = (fileInputId) => {
-          return new Promise((resolve) => {
-            const fileInput = document.getElementById(fileInputId);
-            if (fileInput.files && fileInput.files[0]) {
-              const reader = new FileReader();
-              reader.onload = function(e) {
-                localStorage.setItem(fileInputId, e.target.result);
-                resolve(e.target.result);
-              };
-              reader.readAsDataURL(fileInput.files[0]);
-            } else {
-              resolve(null);
-            }
-          });
-        };
-
-        // Save all images to localStorage
-        await processImage('photo');
-        await processImage('applicantPhoto');
-        await processImage('nidaPhoto');
-
-        // Generate PDF
-        const { jsPDF } = window.jspdf;
-        const doc = new jsPDF();
+        validatePhoneNumber(formData.phone, 'phoneError');
+        validatePhoneNumber(formData.contactPhone, 'contactPhoneError');
         
-        doc.setFontSize(16);
-        doc.setTextColor(40, 40, 40);
-        doc.text("TAARIFA YA MWOMBAJI WA MKOPO", 105, 15, null, null, 'center');
+        // Validate NIDA number
+        validateNIDANumber(formData.nida);
         
-        doc.setFontSize(12);
-        doc.text("TAARIFA BINAFSI", 14, 25);
-        doc.text(`Jina Kamili: ${formData.firstName} ${formData.middleName} ${formData.lastName}`, 14, 35);
-        doc.text(`Namba ya NIDA: ${formData.nida}`, 14, 45);
-        doc.text(`Namba ya Simu: ${formData.phone}`, 14, 55);
-        doc.text(`Anuani: ${formData.mtaa}, ${formData.kata}, ${formData.wilaya}, ${formData.mkoa}`, 14, 65);
-        doc.text(`Eneo la Biashara: ${formData.biashara || 'Hakuna'}`, 14, 75);
+        // Process and save images
+        await processAndSaveImages();
         
-        doc.text("MTU WA KARIBU", 14, 90);
-        doc.text(`Jina: ${formData.contactFirstName} ${formData.contactMiddleName} ${formData.contactLastName}`, 14, 100);
-        doc.text(`Uhusiano: ${formData.contactUhusiano}`, 14, 110);
-        doc.text(`Simu: ${formData.contactPhone}`, 14, 120);
-        doc.text(`Anuani: ${formData.contactMtaa}, ${formData.contactKata}, ${formData.contactWilaya}, ${formData.contactMkoa}`, 14, 130);
+        // Generate and save PDF
+        await generateAndSavePDF(formData);
         
-        doc.text("VIAMBATANISHO", 14, 145);
-        doc.text(`Picha ya Profaili: Imetumwa`, 14, 155);
-        doc.text(`Picha ya Muombaji: Imetumwa`, 14, 165);
-        doc.text(`Picha ya NIDA: Imetumwa`, 14, 175);
-        
-        doc.text("Saini ya Mwombaji: _________________________", 14, 190);
-        doc.text("Tarehe: _________________________", 14, 200);
-        
-        const pdfBlob = doc.output('blob');
-        const pdfUrl = URL.createObjectURL(pdfBlob);
-        
-        // Store all data in localStorage
-        localStorage.setItem('mkopoChapChapUserData', JSON.stringify(formData));
-        localStorage.setItem('mkopoChapChapPDF', pdfUrl);
-
         // Show success message
-        await Swal.fire({
-          title: 'Hongera!',
-          text: 'Umefanikiwa kujiunga na mfumo wa Mkopo ChapChap',
-          icon: 'success',
-          confirmButtonText: 'Endelea',
-          background: 'rgba(255, 255, 255, 0.9)',
-          backdrop: 'rgba(0, 0, 0, 0.5)',
-          willClose: () => {
-            window.location.href = 'profile.html';
-          }
-        });
-
-      } catch (error) {
-        console.error('Error during registration:', error);
-        Swal.fire({
-          title: 'Hitilafu',
-          text: error.message || 'Kumetokea hitilafu wakati wa kujiunga. Tafadhali jaribu tena.',
-          icon: 'error',
-          confirmButtonText: 'Sawa',
-          background
+        await showSuccessM
