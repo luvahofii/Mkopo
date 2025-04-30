@@ -224,7 +224,7 @@
 </head>
 <body>
   <div class="loan-form">
-    <img src="logo.png" alt="MKOPO CHAPCHAP Logo" class="logo">
+    <img src="assets/logo.png" alt="MKOPO CHAPCHAP Logo" class="logo">
     <h1>Omba Mkopo</h1>
 
     <!-- Display user info -->
@@ -286,59 +286,92 @@
   </div>
 
   <script>
-    const loanForm = document.getElementById('loanForm');
-    const submitBtn = loanForm.querySelector('button[type="submit"]');
-    const spinner = document.getElementById('spinner');
-    const submitText = document.getElementById('submit-text');
-    const toast = document.getElementById('toast');
-    const confirmationModal = document.getElementById('confirmationModal');
-    const confirmSubmit = document.getElementById('confirmSubmit');
-    const cancelSubmit = document.getElementById('cancelSubmit');
+const loanForm = document.getElementById('loanForm');
+const submitBtn = loanForm.querySelector('button[type="submit"]');
+const spinner = document.getElementById('spinner');
+const submitText = document.getElementById('submit-text');
+const toast = document.getElementById('toast');
+const confirmationModal = document.getElementById('confirmationModal');
+const confirmSubmit = document.getElementById('confirmSubmit');
+const cancelSubmit = document.getElementById('cancelSubmit');
 
-    // Load user info and PDF from localStorage
-    const user = JSON.parse(localStorage.getItem("userInfo"));
-    const pdfData = localStorage.getItem("formPDF");
+// Load user info and PDF from localStorage
+const user = JSON.parse(localStorage.getItem("userInfo"));
+const pdfData = localStorage.getItem("formPDF");
 
-    if (user) {
-      document.getElementById("nidaDisplay").textContent = user.nida;
-      document.getElementById("phoneDisplay").textContent = user.phone;
-    }
+if (user) {
+  document.getElementById("nidaDisplay").textContent = user.nida;
+  document.getElementById("phoneDisplay").textContent = user.phone;
+}
 
-    if (pdfData) {
-      document.getElementById("pdfPreview").src = pdfData;
-    }
+if (pdfData) {
+  document.getElementById("pdfPreview").src = pdfData;
+}
 
-    loanForm.addEventListener('submit', function(e) {
-      e.preventDefault();
-      confirmationModal.classList.add('show');
-    });
+loanForm.addEventListener('submit', function(e) {
+  e.preventDefault();
+  confirmationModal.classList.add('show');
+});
 
-    cancelSubmit.addEventListener('click', () => {
-      confirmationModal.classList.remove('show');
-    });
+cancelSubmit.addEventListener('click', () => {
+  confirmationModal.classList.remove('show');
+});
 
-    confirmSubmit.addEventListener('click', () => {
-      spinner.style.display = 'inline-block';
-      submitText.textContent = 'Tafadhali subiri...';
-      submitBtn.disabled = true;
+confirmSubmit.addEventListener('click', () => {
+  spinner.style.display = 'inline-block';
+  submitText.textContent = 'Tafadhali subiri...';
+  submitBtn.disabled = true;
 
-      setTimeout(() => {
-        spinner.style.display = 'none';
-        submitText.textContent = 'Wasilisha Maombi';
-        submitBtn.disabled = false;
+  // Collect all form data
+  const formData = {
+    loanType: document.getElementById('loan-type').value,
+    loanPeriod: document.getElementById('loan-period').value,
+    loanAmount: document.getElementById('loan-amount').value,
+    loanPurpose: document.getElementById('loan-purpose').value,
+    userInfo: user || {},
+    signupPdf: pdfData
+  };
 
-        toast.classList.add('show');
-        setTimeout(() => {
-          toast.classList.remove('show');
-          toast.classList.add('hide');
-        }, 2000);
-        setTimeout(() => {
-          window.location.href = 'profile.html';
-        }, 3000);
-      }, 2000);
+  // Format WhatsApp message
+  const whatsappMessage = `*MKOPO CHAPCHAP - MAOMBI YA MKOPO*\n\n` +
+    `*Maelezo ya Mtumiaji:*\n` +
+    `📱 Nambari: ${formData.userInfo.phone || 'Hajatoa'}\n` +
+    `🆔 NIDA: ${formData.userInfo.nida || 'Hajatoa'}\n\n` +
+    `*Maelezo ya Mkopo:*\n` +
+    `💰 Aina: ${formData.loanType}\n` +
+    `⏳ Muda: ${formData.loanPeriod}\n` +
+    `🔢 Kiasi: TSh ${formData.loanAmount}\n` +
+    `📝 Sababu: ${formData.loanPurpose}\n\n` +
+    `*Viambatanisho:*\n` +
+    `1. Fomu ya Usajili: ${formData.signupPdf || 'Haijapatikana'}\n\n` +
+    `_Tarehe ya kuwasilisha: ${new Date().toLocaleDateString()}_`;
 
-      confirmationModal.classList.remove('show');
-    });
+  // Encode for WhatsApp URL
+  const encodedMessage = encodeURIComponent(whatsappMessage);
+  
+  // Replace with your WhatsApp number (format: 255xxxxxxxxx)
+  const whatsappNumber = '255XXXXXXXXX'; // CHANGE THIS TO YOUR NUMBER
+  
+  // Open WhatsApp with pre-filled message
+  window.open(`https://wa.me/${whatsappNumber}?text=${encodedMessage}`, '_blank');
+
+  setTimeout(() => {
+    spinner.style.display = 'none';
+    submitText.textContent = 'Wasilisha Maombi';
+    submitBtn.disabled = false;
+
+    toast.classList.add('show');
+    setTimeout(() => {
+      toast.classList.remove('show');
+      toast.classList.add('hide');
+    }, 2000);
+    setTimeout(() => {
+      window.location.href = 'profile.html';
+    }, 3000);
+  }, 2000);
+
+  confirmationModal.classList.remove('show');
+});
   </script>
 </body>
 </html>
