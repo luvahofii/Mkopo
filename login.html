@@ -339,13 +339,13 @@
     
     <form id="loginForm">
       <div class="form-group">
-        <label for="phone">Namba ya Simu:</label>
-        <input type="tel" id="phone" placeholder="07XXXXXXXX" required>
+        <label for="email">Barua Pepe:</label>
+        <input type="email" id="email" placeholder="Weka barua pepe yako" required>
       </div>
       
       <div class="form-group">
         <label for="password">Nenosiri:</label>
-        <input type="password" id="password" placeholder="Namba sita za mwisho za NIDA" required>
+        <input type="password" id="password" placeholder="Weka nenosiri lako" required>
       </div>
       
       <div class="spinner" id="spinner"></div>
@@ -362,23 +362,44 @@
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  
+  <!-- Firebase App (the core Firebase SDK) -->
+  <script src="https://www.gstatic.com/firebasejs/11.6.1/firebase-app-compat.js"></script>
+  
+  <!-- Firebase Authentication -->
+  <script src="https://www.gstatic.com/firebasejs/11.6.1/firebase-auth-compat.js"></script>
+  
   <script>
+    // Your web app's Firebase configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyD68mTUrzH5ph8K5ZAk9iDveCRk2kxqp-k",
+      authDomain: "mkopo-1.firebaseapp.com",
+      projectId: "mkopo-1",
+      storageBucket: "mkopo-1.appspot.com",
+      messagingSenderId: "628857354448",
+      appId: "1:628857354448:web:9d5b7cad0a59f0c29186d5"
+    };
+
+    // Initialize Firebase
+    const app = firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+
     document.getElementById('loginForm').addEventListener('submit', function (event) {
       event.preventDefault();
       
       const spinner = document.getElementById('spinner');
-      const phone = document.getElementById('phone').value.trim();
+      const email = document.getElementById('email').value.trim();
       const password = document.getElementById('password').value.trim();
       
       // Show loading spinner
       spinner.style.display = 'block';
       
-      // Validate phone number format
-      if (!/^0[67]\d{8}$/.test(phone)) {
+      // Validate email format
+      if (!email) {
         spinner.style.display = 'none';
         Swal.fire({
           title: 'Hitilafu',
-          text: 'Tafadhali ingiza namba ya simu sahihi (Airtel, Tigo, Halotel au Vodacom)',
+          text: 'Tafadhali ingiza barua pepe yako',
           icon: 'error',
           background: 'rgba(255, 255, 255, 0.9)',
           backdrop: 'rgba(0, 0, 0, 0.5)'
@@ -399,66 +420,72 @@
         return;
       }
       
-      // Simulate network delay
-      setTimeout(() => {
-        // Check user in localStorage
-        const users = JSON.parse(localStorage.getItem('mkopoChapChapUsers')) || [];
-        const user = users.find(u => u.phone === phone);
-        
-        if (user) {
-          // Check password (last 6 digits of NIDA)
-          if (user.password === password) {
-            // Successful login
-            localStorage.setItem('currentUser', JSON.stringify(user));
-            localStorage.setItem('lastUserPhone', phone);
-            spinner.style.display = 'none';
-            
-            Swal.fire({
-              title: 'Karibu tena!',
-              text: `Umefanikiwa kuingia kama ${user.firstName} ${user.lastName}`,
-              icon: 'success',
-              confirmButtonText: 'Endelea',
-              background: 'rgba(255, 255, 255, 0.9)',
-              backdrop: 'rgba(0, 0, 0, 0.5)'
-            }).then(() => {
-              window.location.href = 'profile.html';
-            });
-          } else {
-            spinner.style.display = 'none';
-            Swal.fire({
-              title: 'Hitilafu',
-              text: 'Nenosiri sio sahihi',
-              icon: 'error',
-              background: 'rgba(255, 255, 255, 0.9)',
-              backdrop: 'rgba(0, 0, 0, 0.5)'
-            });
-          }
-        } else {
+      // Sign in with email and password
+      auth.signInWithEmailAndPassword(email, password)
+        .then((userCredential) => {
+          // Signed in successfully
           spinner.style.display = 'none';
+          
+          // Store email in sessionStorage for future use
+          sessionStorage.setItem('lastUserEmail', email);
+          
           Swal.fire({
-            title: 'Akaunti Haipatikani',
-            text: 'Akaunti hii haijasajiliwa. Tafadhali jiunge kwanza',
+            title: 'Karibu tena!',
+            text: 'Umefanikiwa kuingia kwenye akaunti yako',
+            icon: 'success',
+            confirmButtonText: 'Endelea',
+            background: 'rgba(255, 255, 255, 0.9)',
+            backdrop: 'rgba(0, 0, 0, 0.5)'
+          }).then(() => {
+            window.location.href = 'profile.html';
+          });
+        })
+        .catch((error) => {
+          spinner.style.display = 'none';
+          let errorMessage = 'Hitilafu katika mfumo. Tafadhali jaribu tena baadaye.';
+          
+          switch (error.code) {
+            case 'auth/user-not-found':
+              errorMessage = 'Akaunti hii haijasajiliwa. Tafadhali jiunge kwanza';
+              break;
+            case 'auth/wrong-password':
+              errorMessage = 'Nenosiri sio sahihi';
+              break;
+            case 'auth/invalid-email':
+              errorMessage = 'Barua pepe sio sahihi';
+              break;
+            case 'auth/too-many-requests':
+              errorMessage = 'Majaribu mengi ya kuingia. Tafadhali jaribu tena baadaye';
+              break;
+          }
+          
+          Swal.fire({
+            title: 'Hitilafu',
+            text: errorMessage,
             icon: 'error',
-            confirmButtonText: 'Jiunge Sasa',
-            showCancelButton: true,
-            cancelButtonText: 'Funga',
             background: 'rgba(255, 255, 255, 0.9)',
             backdrop: 'rgba(0, 0, 0, 0.5)'
           }).then((result) => {
-            if (result.isConfirmed) {
+            if (error.code === 'auth/user-not-found' && result.isConfirmed) {
               window.location.href = 'signup.html';
             }
           });
-        }
-      }, 1000);
+        });
     });
 
-    // Load phone number from localStorage if available
-    window.addEventListener('DOMContentLoaded', () => {
-      const lastUserPhone = localStorage.getItem('lastUserPhone');
-      if (lastUserPhone) {
-        document.getElementById('phone').value = lastUserPhone;
-        document.getElementById('password').focus();
+    // Check if user is already logged in
+    auth.onAuthStateChanged((user) => {
+      if (user) {
+        // User is signed in, redirect to profile
+        window.location.href = 'profile.html';
+      } else {
+        // No user is signed in
+        // Load email from session if available
+        const lastUserEmail = sessionStorage.getItem('lastUserEmail');
+        if (lastUserEmail) {
+          document.getElementById('email').value = lastUserEmail;
+          document.getElementById('password').focus();
+        }
       }
     });
   </script>
