@@ -7,6 +7,11 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.10.5/dist/sweetalert2.min.css">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <!-- Add Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/11.6.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/11.6.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/11.6.1/firebase-storage-compat.js"></script>
   <style>
     /* DEEP GLASSMORPHISM + NEUMORPHISM STYLING */
     :root {
@@ -393,6 +398,18 @@
         </div>
       </div>
       
+      <!-- Added Email Field -->
+      <div class="input-group">
+        <input type="email" id="email" placeholder="Barua Pepe" required>
+        <div class="error-message" id="emailError">Tafadhali jaza barua pepe sahihi</div>
+      </div>
+      
+      <!-- Added Password Field -->
+      <div class="input-group">
+        <input type="password" id="password" placeholder="Nenosiri" required>
+        <div class="error-message" id="passwordError">Nenosiri linapaswa kuwa na herufi 6 au zaidi</div>
+      </div>
+      
       <div class="input-group">
         <input type="text" id="nida" placeholder="Namba ya NIDA" required>
         <div class="error-message" id="nidaError">Namba ya NIDA inapaswa kuwa na tarakimu 20</div>
@@ -572,6 +589,21 @@
     // Initialize jsPDF
     const { jsPDF } = window.jspdf;
     
+    // Initialize Firebase
+    const firebaseConfig = {
+      apiKey: "AIzaSyD68mTUrzH5ph8K5ZAk9iDveCRk2kxqp-k",
+      authDomain: "mkopo-1.firebaseapp.com",
+      projectId: "mkopo-1",
+      storageBucket: "mkopo-1.appspot.com",
+      messagingSenderId: "628857354448",
+      appId: "1:628857354448:web:9d5b7cad0a59f0c29186d5"
+    };
+
+    const app = firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+    const storage = firebase.storage();
+    
     // DOM Elements
     const form = document.getElementById('signupForm');
     const spinner = document.getElementById('spinnerOverlay');
@@ -581,7 +613,9 @@
       required: 'Sehemu hii inahitajika',
       phone: 'Namba ya simu sio sahihi. Ingiza namba ya Airtel, Tigo, Halotel au Vodacom.',
       nida: 'Namba ya NIDA inapaswa kuwa na tarakimu 20',
-      image: 'Tafadhali pakia picha'
+      image: 'Tafadhali pakia picha',
+      email: 'Barua pepe sio sahihi',
+      password: 'Nenosiri linapaswa kuwa na herufi 6 au zaidi'
     };
     
     // Real-time validation
@@ -595,6 +629,14 @@
     
     document.getElementById('nida').addEventListener('input', function() {
       validateNIDA(this);
+    });
+    
+    document.getElementById('email').addEventListener('input', function() {
+      validateEmail(this);
+    });
+    
+    document.getElementById('password').addEventListener('input', function() {
+      validatePassword(this);
     });
     
     // Image preview handlers
@@ -635,19 +677,47 @@
           throw new Error(errorMessages.phone);
         }
         
-         // Validate NIDA number
+        // Validate NIDA number
         if (!validateNIDA(document.getElementById('nida'))) {
           throw new Error(errorMessages.nida);
         }
         
-        // Process and save images
-        await processAndSaveImages();
+        // Validate email
+        if (!validateEmail(document.getElementById('email'))) {
+          throw new Error(errorMessages.email);
+        }
         
-        // Save user data
-        saveUserData(formData);
+        // Validate password
+        if (!validatePassword(document.getElementById('password'))) {
+          throw new Error(errorMessages.password);
+        }
         
-        // Generate and save PDF
-        await generateAndSavePDF(formData);
+        // Create user with email and password
+        const userCredential = await auth.createUserWithEmailAndPassword(
+          formData.email, 
+          formData.password
+        );
+        
+        // Upload images to Firebase Storage
+        const photoUrl = await uploadImage('photo', userCredential.user.uid);
+        const applicantPhotoUrl = await uploadImage('applicantPhoto', userCredential.user.uid);
+        const nidaPhotoUrl = await uploadImage('nidaPhoto', userCredential.user.uid);
+        
+        // Add image URLs to form data
+        formData.photoUrl = photoUrl;
+        formData.applicantPhotoUrl = applicantPhotoUrl;
+        formData.nidaPhotoUrl = nidaPhotoUrl;
+        
+        // Save user data to Firestore
+        await db.collection('users').doc(userCredential.user.uid).set(formData);
+        
+        // Generate PDF
+        const pdfUrl = await generateAndSavePDF(formData, userCredential.user.uid);
+        
+        // Update user record with PDF URL
+        await db.collection('users').doc(userCredential.user.uid).update({
+          pdfUrl: pdfUrl
+        });
         
         // Show success message
         await Swal.fire({
@@ -659,13 +729,8 @@
           backdrop: 'rgba(0, 0, 0, 0.5)'
         });
         
-        // Clear form
-        form.reset();
-        
-        // Clear image previews
-        document.getElementById('photoPreview').innerHTML = '';
-        document.getElementById('applicantPreview').innerHTML = '';
-        document.getElementById('nidaPreview').innerHTML = '';
+        // Redirect to profile page
+        window.location.href = 'profile.html';
         
       } catch (error) {
         console.error('Error during registration:', error);
@@ -688,7 +753,7 @@
       
       // Validate required fields
       const requiredFields = [
-        'firstName', 'middleName', 'lastName', 'nida', 'phone', 'mkoa', 
+        'firstName', 'middleName', 'lastName', 'email', 'password', 'nida', 'phone', 'mkoa', 
         'wilaya', 'kata', 'mtaa', 'contactFirstName', 'contactMiddleName', 
         'contactLastName', 'contactPhone', 'contactMkoa', 'contactWilaya', 
         'contactKata', 'contactMtaa', 'contactUhusiano', 'photo', 
@@ -742,11 +807,44 @@
       }
     }
     
+    function validateEmail(input) {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      const errorElement = document.getElementById('emailError');
+      
+      if (!emailRegex.test(input.value)) {
+        input.classList.add('input-error');
+        errorElement.textContent = errorMessages.email;
+        errorElement.style.display = 'block';
+        return false;
+      } else {
+        input.classList.remove('input-error');
+        errorElement.style.display = 'none';
+        return true;
+      }
+    }
+    
+    function validatePassword(input) {
+      const errorElement = document.getElementById('passwordError');
+      
+      if (input.value.length < 6) {
+        input.classList.add('input-error');
+        errorElement.textContent = errorMessages.password;
+        errorElement.style.display = 'block';
+        return false;
+      } else {
+        input.classList.remove('input-error');
+        errorElement.style.display = 'none';
+        return true;
+      }
+    }
+    
     function collectFormData() {
       return {
         firstName: document.getElementById('firstName').value.trim(),
         middleName: document.getElementById('middleName').value.trim(),
         lastName: document.getElementById('lastName').value.trim(),
+        email: document.getElementById('email').value.trim(),
+        password: document.getElementById('password').value.trim(),
         nida: document.getElementById('nida').value.trim(),
         phone: document.getElementById('phone').value.trim(),
         mkoa: document.getElementById('mkoa').value,
@@ -767,68 +865,31 @@
       };
     }
     
-    function saveUserData(formData) {
-      // Save user data for login
-      const users = JSON.parse(localStorage.getItem('mkopoChapChapUsers')) || [];
-      
-      // Check if user already exists
-      const userExists = users.some(user => user.phone === formData.phone || user.nida === formData.nida);
-      
-      if (userExists) {
-        throw new Error('Namba ya simu au NIDA tayari imesajiliwa');
+    async function uploadImage(inputId, userId) {
+      const fileInput = document.getElementById(inputId);
+      if (!fileInput.files || !fileInput.files[0]) {
+        throw new Error(`Tafadhali pakia ${inputId}`);
       }
       
-      // Create user object with minimal login info
-      const user = {
-        phone: formData.phone,
-        password: formData.nida.slice(-6), // Using last 6 digits of NIDA as default password
-        firstName: formData.firstName,
-        lastName: formData.lastName,
-        nida: formData.nida,
-        registeredAt: new Date().toISOString()
-      };
+      const file = fileInput.files[0];
       
-      users.push(user);
-      localStorage.setItem('mkopoChapChapUsers', JSON.stringify(users));
-      
-      // Save complete form data
-      localStorage.setItem(`mkopoChapChapUser_${formData.phone}`, JSON.stringify(formData));
-    }
-    
-    async function processAndSaveImages() {
-      const imageFields = ['photo', 'applicantPhoto', 'nidaPhoto'];
-      
-      for (const field of imageFields) {
-        const fileInput = document.getElementById(field);
-        if (fileInput.files && fileInput.files[0]) {
-          // Check file size (max 2MB)
-          if (fileInput.files[0].size > 2 * 1024 * 1024) {
-            throw new Error(`Picha ya ${field} ni kubwa sana. Tafadhali tumia picha chini ya 2MB.`);
-          }
-          
-          // Save to localStorage
-          await saveImageToLocalStorage(fileInput, field);
-        } else {
-          throw new Error(`Tafadhali pakia ${field}`);
-        }
+      // Check file size (max 2MB)
+      if (file.size > 2 * 1024 * 1024) {
+        throw new Error(`Picha ya ${inputId} ni kubwa sana. Tafadhali tumia picha chini ya 2MB.`);
       }
+      
+      // Create storage reference
+      const storageRef = storage.ref();
+      const fileRef = storageRef.child(`users/${userId}/${inputId}_${Date.now()}`);
+      
+      // Upload file
+      await fileRef.put(file);
+      
+      // Get download URL
+      return await fileRef.getDownloadURL();
     }
     
-    function saveImageToLocalStorage(fileInput, field) {
-      return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-          localStorage.setItem(field, e.target.result);
-          resolve();
-        };
-        reader.onerror = function() {
-          reject(new Error(`Hitilafu wakati wa kusoma picha ya ${field}`));
-        };
-        reader.readAsDataURL(fileInput.files[0]);
-      });
-    }
-    
-    async function generateAndSavePDF(formData) {
+    async function generateAndSavePDF(formData, userId) {
       return new Promise((resolve, reject) => {
         try {
           const doc = new jsPDF();
@@ -848,34 +909,41 @@
           doc.setFontSize(12);
           doc.text("TAARIFA BINAFSI", 14, 40);
           doc.text(`Jina Kamili: ${formData.firstName} ${formData.middleName} ${formData.lastName}`, 14, 50);
-          doc.text(`Namba ya NIDA: ${formData.nida}`, 14, 60);
-          doc.text(`Namba ya Simu: ${formData.phone}`, 14, 70);
-          doc.text(`Anuani: ${formData.mtaa}, ${formData.kata}, ${formData.wilaya}, ${formData.mkoa}`, 14, 80);
-          doc.text(`Eneo la Biashara: ${formData.biashara || 'Hakuna'}`, 14, 90);
+          doc.text(`Barua Pepe: ${formData.email}`, 14, 60);
+          doc.text(`Namba ya NIDA: ${formData.nida}`, 14, 70);
+          doc.text(`Namba ya Simu: ${formData.phone}`, 14, 80);
+          doc.text(`Anuani: ${formData.mtaa}, ${formData.kata}, ${formData.wilaya}, ${formData.mkoa}`, 14, 90);
+          doc.text(`Eneo la Biashara: ${formData.biashara || 'Hakuna'}`, 14, 100);
           
           // Add contact person information
-          doc.text("MTU WA KARIBU", 14, 110);
-          doc.text(`Jina: ${formData.contactFirstName} ${formData.contactMiddleName} ${formData.contactLastName}`, 14, 120);
-          doc.text(`Uhusiano: ${formData.contactUhusiano}`, 14, 130);
-          doc.text(`Simu: ${formData.contactPhone}`, 14, 140);
-          doc.text(`Anuani: ${formData.contactMtaa}, ${formData.contactKata}, ${formData.contactWilaya}, ${formData.contactMkoa}`, 14, 150);
+          doc.text("MTU WA KARIBU", 14, 120);
+          doc.text(`Jina: ${formData.contactFirstName} ${formData.contactMiddleName} ${formData.contactLastName}`, 14, 130);
+          doc.text(`Uhusiano: ${formData.contactUhusiano}`, 14, 140);
+          doc.text(`Simu: ${formData.contactPhone}`, 14, 150);
+          doc.text(`Anuani: ${formData.contactMtaa}, ${formData.contactKata}, ${formData.contactWilaya}, ${formData.contactMkoa}`, 14, 160);
           
           // Add attachments information
-          doc.text("VIAMBATANISHO", 14, 170);
-          doc.text(`Picha ya Profaili: Imetumwa`, 14, 180);
-          doc.text(`Picha ya Muombaji: Imetumwa`, 14, 190);
-          doc.text(`Picha ya NIDA: Imetumwa`, 14, 200);
+          doc.text("VIAMBATANISHO", 14, 180);
+          doc.text(`Picha ya Profaili: Imetumwa`, 14, 190);
+          doc.text(`Picha ya Muombaji: Imetumwa`, 14, 200);
+          doc.text(`Picha ya NIDA: Imetumwa`, 14, 210);
           
           // Add signature and date
-          doc.text("Saini ya Mwombaji: _________________________", 14, 220);
-          doc.text("Tarehe: _________________________", 14, 230);
+          doc.text("Saini ya Mwombaji: _________________________", 14, 230);
+          doc.text("Tarehe: _________________________", 14, 240);
           
-          // Save PDF
+          // Generate PDF blob
           const pdfBlob = doc.output('blob');
-          const pdfUrl = URL.createObjectURL(pdfBlob);
-          localStorage.setItem(`mkopoChapChapPDF_${formData.phone}`, pdfUrl);
           
-          resolve();
+          // Upload PDF to Firebase Storage
+          const storageRef = storage.ref();
+          const pdfRef = storageRef.child(`users/${userId}/application_${Date.now()}.pdf`);
+          
+          pdfRef.put(pdfBlob).then(() => {
+            pdfRef.getDownloadURL().then(url => {
+              resolve(url);
+            });
+          });
         } catch (error) {
           reject(new Error('Hitilafu wakati wa kutengeneza PDF'));
         }
@@ -918,34 +986,6 @@
         inputElement.classList.remove('input-error');
       }
     }
-    
-    // Load previously saved data if available
-    window.addEventListener('DOMContentLoaded', () => {
-      const savedData = localStorage.getItem('mkopoChapChapUserData');
-      if (savedData) {
-        const data = JSON.parse(savedData);
-        
-        // Populate form fields
-        Object.keys(data).forEach(key => {
-          const element = document.getElementById(key);
-          if (element) element.value = data[key];
-        });
-        
-        // Load saved images
-        ['photo', 'applicantPhoto', 'nidaPhoto'].forEach(id => {
-          const imgData = localStorage.getItem(id);
-          if (imgData) {
-            const previewId = `${id}Preview`;
-            const preview = document.getElementById(previewId);
-            if (preview) {
-              const img = document.createElement('img');
-              img.src = imgData;
-              preview.appendChild(img);
-            }
-          }
-        });
-      }
-    });
   </script>
 </body>
 </html>
