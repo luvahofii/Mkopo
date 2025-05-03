@@ -635,4 +635,317 @@
           throw new Error(errorMessages.phone);
         }
         
-        // Vali
+         // Validate NIDA number
+        if (!validateNIDA(document.getElementById('nida'))) {
+          throw new Error(errorMessages.nida);
+        }
+        
+        // Process and save images
+        await processAndSaveImages();
+        
+        // Save user data
+        saveUserData(formData);
+        
+        // Generate and save PDF
+        await generateAndSavePDF(formData);
+        
+        // Show success message
+        await Swal.fire({
+          title: 'Hongera!',
+          text: 'Umefanikiwa kujiunga na mfumo wa Mkopo ChapChap',
+          icon: 'success',
+          confirmButtonText: 'Endelea',
+          background: 'rgba(255, 255, 255, 0.9)',
+          backdrop: 'rgba(0, 0, 0, 0.5)'
+        });
+        
+        // Clear form
+        form.reset();
+        
+        // Clear image previews
+        document.getElementById('photoPreview').innerHTML = '';
+        document.getElementById('applicantPreview').innerHTML = '';
+        document.getElementById('nidaPreview').innerHTML = '';
+        
+      } catch (error) {
+        console.error('Error during registration:', error);
+        Swal.fire({
+          title: 'Hitilafu',
+          text: error.message || 'Kumetokea hitilafu wakati wa kujiunga. Tafadhali jaribu tena.',
+          icon: 'error',
+          confirmButtonText: 'Sawa',
+          background: 'rgba(255, 255, 255, 0.9)',
+          backdrop: 'rgba(0, 0, 0, 0.5)'
+        });
+      } finally {
+        spinner.style.display = 'none';
+      }
+    });
+    
+    // Helper functions
+    function validateForm() {
+      let isValid = true;
+      
+      // Validate required fields
+      const requiredFields = [
+        'firstName', 'middleName', 'lastName', 'nida', 'phone', 'mkoa', 
+        'wilaya', 'kata', 'mtaa', 'contactFirstName', 'contactMiddleName', 
+        'contactLastName', 'contactPhone', 'contactMkoa', 'contactWilaya', 
+        'contactKata', 'contactMtaa', 'contactUhusiano', 'photo', 
+        'applicantPhoto', 'nidaPhoto'
+      ];
+      
+      requiredFields.forEach(field => {
+        const element = document.getElementById(field);
+        if (!element.value.trim()) {
+          showErrorForField(field, errorMessages.required);
+          isValid = false;
+        } else {
+          hideErrorForField(field);
+        }
+      });
+      
+      return isValid;
+    }
+    
+    function validatePhone(input, errorId = 'phoneError') {
+      const phoneRegex = /^0[67]\d{8}$/;
+      const errorElement = document.getElementById(errorId || 'phoneError');
+      
+      if (!phoneRegex.test(input.value)) {
+        input.classList.add('input-error');
+        if (errorElement) {
+          errorElement.textContent = errorMessages.phone;
+          errorElement.style.display = 'block';
+        }
+        return false;
+      } else {
+        input.classList.remove('input-error');
+        if (errorElement) errorElement.style.display = 'none';
+        return true;
+      }
+    }
+    
+    function validateNIDA(input) {
+      const nidaRegex = /^\d{20}$/;
+      const errorElement = document.getElementById('nidaError');
+      
+      if (!nidaRegex.test(input.value)) {
+        input.classList.add('input-error');
+        errorElement.textContent = errorMessages.nida;
+        errorElement.style.display = 'block';
+        return false;
+      } else {
+        input.classList.remove('input-error');
+        errorElement.style.display = 'none';
+        return true;
+      }
+    }
+    
+    function collectFormData() {
+      return {
+        firstName: document.getElementById('firstName').value.trim(),
+        middleName: document.getElementById('middleName').value.trim(),
+        lastName: document.getElementById('lastName').value.trim(),
+        nida: document.getElementById('nida').value.trim(),
+        phone: document.getElementById('phone').value.trim(),
+        mkoa: document.getElementById('mkoa').value,
+        wilaya: document.getElementById('wilaya').value.trim(),
+        kata: document.getElementById('kata').value.trim(),
+        mtaa: document.getElementById('mtaa').value.trim(),
+        biashara: document.getElementById('biashara').value.trim(),
+        contactFirstName: document.getElementById('contactFirstName').value.trim(),
+        contactMiddleName: document.getElementById('contactMiddleName').value.trim(),
+        contactLastName: document.getElementById('contactLastName').value.trim(),
+        contactPhone: document.getElementById('contactPhone').value.trim(),
+        contactMkoa: document.getElementById('contactMkoa').value,
+        contactWilaya: document.getElementById('contactWilaya').value.trim(),
+        contactKata: document.getElementById('contactKata').value.trim(),
+        contactMtaa: document.getElementById('contactMtaa').value.trim(),
+        contactUhusiano: document.getElementById('contactUhusiano').value.trim(),
+        timestamp: new Date().toISOString()
+      };
+    }
+    
+    function saveUserData(formData) {
+      // Save user data for login
+      const users = JSON.parse(localStorage.getItem('mkopoChapChapUsers')) || [];
+      
+      // Check if user already exists
+      const userExists = users.some(user => user.phone === formData.phone || user.nida === formData.nida);
+      
+      if (userExists) {
+        throw new Error('Namba ya simu au NIDA tayari imesajiliwa');
+      }
+      
+      // Create user object with minimal login info
+      const user = {
+        phone: formData.phone,
+        password: formData.nida.slice(-6), // Using last 6 digits of NIDA as default password
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        nida: formData.nida,
+        registeredAt: new Date().toISOString()
+      };
+      
+      users.push(user);
+      localStorage.setItem('mkopoChapChapUsers', JSON.stringify(users));
+      
+      // Save complete form data
+      localStorage.setItem(`mkopoChapChapUser_${formData.phone}`, JSON.stringify(formData));
+    }
+    
+    async function processAndSaveImages() {
+      const imageFields = ['photo', 'applicantPhoto', 'nidaPhoto'];
+      
+      for (const field of imageFields) {
+        const fileInput = document.getElementById(field);
+        if (fileInput.files && fileInput.files[0]) {
+          // Check file size (max 2MB)
+          if (fileInput.files[0].size > 2 * 1024 * 1024) {
+            throw new Error(`Picha ya ${field} ni kubwa sana. Tafadhali tumia picha chini ya 2MB.`);
+          }
+          
+          // Save to localStorage
+          await saveImageToLocalStorage(fileInput, field);
+        } else {
+          throw new Error(`Tafadhali pakia ${field}`);
+        }
+      }
+    }
+    
+    function saveImageToLocalStorage(fileInput, field) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          localStorage.setItem(field, e.target.result);
+          resolve();
+        };
+        reader.onerror = function() {
+          reject(new Error(`Hitilafu wakati wa kusoma picha ya ${field}`));
+        };
+        reader.readAsDataURL(fileInput.files[0]);
+      });
+    }
+    
+    async function generateAndSavePDF(formData) {
+      return new Promise((resolve, reject) => {
+        try {
+          const doc = new jsPDF();
+          
+          // Add logo
+          const logoData = localStorage.getItem('logo');
+          if (logoData) {
+            doc.addImage(logoData, 'JPEG', 14, 10, 30, 15);
+          }
+          
+          // Add title
+          doc.setFontSize(16);
+          doc.setTextColor(40, 40, 40);
+          doc.text("TAARIFA YA MWOMBAJI WA MKOPO", 105, 20, null, null, 'center');
+          
+          // Add personal information
+          doc.setFontSize(12);
+          doc.text("TAARIFA BINAFSI", 14, 40);
+          doc.text(`Jina Kamili: ${formData.firstName} ${formData.middleName} ${formData.lastName}`, 14, 50);
+          doc.text(`Namba ya NIDA: ${formData.nida}`, 14, 60);
+          doc.text(`Namba ya Simu: ${formData.phone}`, 14, 70);
+          doc.text(`Anuani: ${formData.mtaa}, ${formData.kata}, ${formData.wilaya}, ${formData.mkoa}`, 14, 80);
+          doc.text(`Eneo la Biashara: ${formData.biashara || 'Hakuna'}`, 14, 90);
+          
+          // Add contact person information
+          doc.text("MTU WA KARIBU", 14, 110);
+          doc.text(`Jina: ${formData.contactFirstName} ${formData.contactMiddleName} ${formData.contactLastName}`, 14, 120);
+          doc.text(`Uhusiano: ${formData.contactUhusiano}`, 14, 130);
+          doc.text(`Simu: ${formData.contactPhone}`, 14, 140);
+          doc.text(`Anuani: ${formData.contactMtaa}, ${formData.contactKata}, ${formData.contactWilaya}, ${formData.contactMkoa}`, 14, 150);
+          
+          // Add attachments information
+          doc.text("VIAMBATANISHO", 14, 170);
+          doc.text(`Picha ya Profaili: Imetumwa`, 14, 180);
+          doc.text(`Picha ya Muombaji: Imetumwa`, 14, 190);
+          doc.text(`Picha ya NIDA: Imetumwa`, 14, 200);
+          
+          // Add signature and date
+          doc.text("Saini ya Mwombaji: _________________________", 14, 220);
+          doc.text("Tarehe: _________________________", 14, 230);
+          
+          // Save PDF
+          const pdfBlob = doc.output('blob');
+          const pdfUrl = URL.createObjectURL(pdfBlob);
+          localStorage.setItem(`mkopoChapChapPDF_${formData.phone}`, pdfUrl);
+          
+          resolve();
+        } catch (error) {
+          reject(new Error('Hitilafu wakati wa kutengeneza PDF'));
+        }
+      });
+    }
+    
+    function previewImage(input, previewId) {
+      const preview = document.getElementById(previewId);
+      preview.innerHTML = '';
+      
+      if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          const img = document.createElement('img');
+          img.src = e.target.result;
+          preview.appendChild(img);
+          hideErrorForField(input.id);
+        };
+        reader.readAsDataURL(input.files[0]);
+      }
+    }
+    
+    function showErrorForField(fieldId, message) {
+      const errorElement = document.getElementById(`${fieldId}Error`);
+      const inputElement = document.getElementById(fieldId);
+      
+      if (errorElement && inputElement) {
+        errorElement.textContent = message;
+        errorElement.style.display = 'block';
+        inputElement.classList.add('input-error');
+      }
+    }
+    
+    function hideErrorForField(fieldId) {
+      const errorElement = document.getElementById(`${fieldId}Error`);
+      const inputElement = document.getElementById(fieldId);
+      
+      if (errorElement && inputElement) {
+        errorElement.style.display = 'none';
+        inputElement.classList.remove('input-error');
+      }
+    }
+    
+    // Load previously saved data if available
+    window.addEventListener('DOMContentLoaded', () => {
+      const savedData = localStorage.getItem('mkopoChapChapUserData');
+      if (savedData) {
+        const data = JSON.parse(savedData);
+        
+        // Populate form fields
+        Object.keys(data).forEach(key => {
+          const element = document.getElementById(key);
+          if (element) element.value = data[key];
+        });
+        
+        // Load saved images
+        ['photo', 'applicantPhoto', 'nidaPhoto'].forEach(id => {
+          const imgData = localStorage.getItem(id);
+          if (imgData) {
+            const previewId = `${id}Preview`;
+            const preview = document.getElementById(previewId);
+            if (preview) {
+              const img = document.createElement('img');
+              img.src = imgData;
+              preview.appendChild(img);
+            }
+          }
+        });
+      }
+    });
+  </script>
+</body>
+</html>
