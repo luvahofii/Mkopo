@@ -5,6 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Profaili - MKOPO CHAPCHAP</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"/>
+  <!-- Add Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/11.6.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/11.6.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/11.6.1/firebase-storage-compat.js"></script>
   <style>
     body {
       background: linear-gradient(135deg, #f8f9fa, #e9ecef);
@@ -122,24 +127,54 @@
   </div>
 
   <script>
-    // Load user from localStorage
-    document.addEventListener('DOMContentLoaded', function() {
-      const userData = JSON.parse(localStorage.getItem('mkopoChapChapUserData'));
-      const profilePhoto = localStorage.getItem('photo');
+    // Initialize Firebase
+    const firebaseConfig = {
+      apiKey: "AIzaSyD68mTUrzH5ph8K5ZAk9iDveCRk2kxqp-k",
+      authDomain: "mkopo-1.firebaseapp.com",
+      projectId: "mkopo-1",
+      storageBucket: "mkopo-1.appspot.com",
+      messagingSenderId: "628857354448",
+      appId: "1:628857354448:web:9d5b7cad0a59f0c29186d5"
+    };
 
-      if (userData) {
-        // Set profile information
-        document.getElementById('profileName').textContent = 
-          `${userData.firstName || ''} ${userData.middleName || ''} ${userData.lastName || ''}`.trim() || 'Guest';
-        
-        document.getElementById('profilePhone').textContent = `Simu: ${userData.phone || 'Not provided'}`;
-        document.getElementById('profileNida').textContent = `NIDA: ${userData.nida || 'Not provided'}`;
-        
-        // Set profile photo if available
-        if (profilePhoto) {
-          document.getElementById('profilePic').src = profilePhoto;
+    const app = firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+    const storage = firebase.storage();
+
+    // Check authentication state and load user data
+    auth.onAuthStateChanged(async (user) => {
+      if (user) {
+        // User is signed in
+        try {
+          // Get user data from Firestore
+          const userDoc = await db.collection('users').doc(user.uid).get();
+          
+          if (userDoc.exists) {
+            const userData = userDoc.data();
+            
+            // Set profile information
+            document.getElementById('profileName').textContent = 
+              `${userData.firstName || ''} ${userData.middleName || ''} ${userData.lastName || ''}`.trim() || 'Guest';
+            
+            document.getElementById('profilePhone').textContent = `Simu: ${userData.phone || 'Not provided'}`;
+            document.getElementById('profileNida').textContent = `NIDA: ${userData.nida || 'Not provided'}`;
+            
+            // Set profile photo if available
+            if (userData.photoUrl) {
+              document.getElementById('profilePic').src = userData.photoUrl;
+            }
+          } else {
+            console.log("No user data found in Firestore");
+            window.location.href = 'login.html';
+          }
+        } catch (error) {
+          console.error("Error fetching user data:", error);
+          alert("Hitilafu katika kupata taarifa za mtumiaji. Tafadhali jaribu tena.");
+          window.location.href = 'login.html';
         }
       } else {
+        // No user is signed in
         alert("Tafadhali ingia kwanza.");
         window.location.href = 'login.html';
       }
