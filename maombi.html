@@ -5,6 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Omba Mkopo - MKOPO CHAPCHAP</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <!-- Add Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/11.6.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/11.6.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore-compat.js"></script>
   <style>
     /* STILI ZA MSINGI */
     * {
@@ -132,7 +136,7 @@
       background: #c0392b;
     }
 
-    .info-display, .pdf-section {
+    .info-display {
       text-align: left;
       margin-bottom: 1.5rem;
       background: #f6f6f6;
@@ -144,11 +148,6 @@
       margin-bottom: 0.5rem;
       font-size: 0.95rem;
       color: #2c3e50;
-    }
-
-    iframe {
-      border: 1px solid #ccc;
-      border-radius: 8px;
     }
 
     /* Toast Style */
@@ -191,6 +190,7 @@
       opacity: 0;
       pointer-events: none;
       transition: opacity 0.3s ease;
+      z-index: 1000;
     }
 
     .confirmation-modal.show {
@@ -231,12 +231,6 @@
     <div class="info-display">
       <p><strong>NIDA:</strong> <span id="nidaDisplay"></span></p>
       <p><strong>Simu:</strong> <span id="phoneDisplay"></span></p>
-    </div>
-
-    <!-- Display saved signup form PDF -->
-    <div class="pdf-section">
-      <p><strong>Fomu ya Usajili (PDF):</strong></p>
-      <iframe id="pdfPreview" width="100%" height="300px"></iframe>
     </div>
 
     <form id="loanForm">
@@ -286,92 +280,106 @@
   </div>
 
   <script>
-const loanForm = document.getElementById('loanForm');
-const submitBtn = loanForm.querySelector('button[type="submit"]');
-const spinner = document.getElementById('spinner');
-const submitText = document.getElementById('submit-text');
-const toast = document.getElementById('toast');
-const confirmationModal = document.getElementById('confirmationModal');
-const confirmSubmit = document.getElementById('confirmSubmit');
-const cancelSubmit = document.getElementById('cancelSubmit');
+    // Initialize Firebase
+    const firebaseConfig = {
+      apiKey: "AIzaSyD68mTUrzH5ph8K5ZAk9iDveCRk2kxqp-k",
+      authDomain: "mkopo-1.firebaseapp.com",
+      projectId: "mkopo-1",
+      storageBucket: "mkopo-1.appspot.com",
+      messagingSenderId: "628857354448",
+      appId: "1:628857354448:web:9d5b7cad0a59f0c29186d5"
+    };
 
-// Load user info and PDF from localStorage
-const user = JSON.parse(localStorage.getItem("userInfo"));
-const pdfData = localStorage.getItem("formPDF");
+    const app = firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
 
-if (user) {
-  document.getElementById("nidaDisplay").textContent = user.nida;
-  document.getElementById("phoneDisplay").textContent = user.phone;
-}
+    // DOM Elements
+    const loanForm = document.getElementById('loanForm');
+    const submitBtn = loanForm.querySelector('button[type="submit"]');
+    const spinner = document.getElementById('spinner');
+    const submitText = document.getElementById('submit-text');
+    const toast = document.getElementById('toast');
+    const confirmationModal = document.getElementById('confirmationModal');
+    const confirmSubmit = document.getElementById('confirmSubmit');
+    const cancelSubmit = document.getElementById('cancelSubmit');
 
-if (pdfData) {
-  document.getElementById("pdfPreview").src = pdfData;
-}
+    // Load current user info
+    auth.onAuthStateChanged(user => {
+      if (user) {
+        // Fetch user data from Firestore
+        db.collection('users').doc(user.uid).get()
+          .then(doc => {
+            if (doc.exists) {
+              const userData = doc.data();
+              document.getElementById("nidaDisplay").textContent = userData.nida || 'Hakuna';
+              document.getElementById("phoneDisplay").textContent = userData.phone || 'Hakuna';
+            }
+          })
+          .catch(error => {
+            console.error("Error fetching user data:", error);
+          });
+      } else {
+        // Redirect to login if not authenticated
+        window.location.href = 'login.html';
+      }
+    });
 
-loanForm.addEventListener('submit', function(e) {
-  e.preventDefault();
-  confirmationModal.classList.add('show');
-});
+    loanForm.addEventListener('submit', function(e) {
+      e.preventDefault();
+      confirmationModal.classList.add('show');
+    });
 
-cancelSubmit.addEventListener('click', () => {
-  confirmationModal.classList.remove('show');
-});
+    cancelSubmit.addEventListener('click', () => {
+      confirmationModal.classList.remove('show');
+    });
 
-confirmSubmit.addEventListener('click', () => {
-  spinner.style.display = 'inline-block';
-  submitText.textContent = 'Tafadhali subiri...';
-  submitBtn.disabled = true;
+    confirmSubmit.addEventListener('click', async () => {
+      spinner.style.display = 'inline-block';
+      submitText.textContent = 'Tafadhali subiri...';
+      submitBtn.disabled = true;
+      confirmationModal.classList.remove('show');
 
-  // Collect all form data
-  const formData = {
-    loanType: document.getElementById('loan-type').value,
-    loanPeriod: document.getElementById('loan-period').value,
-    loanAmount: document.getElementById('loan-amount').value,
-    loanPurpose: document.getElementById('loan-purpose').value,
-    userInfo: user || {},
-    signupPdf: pdfData
-  };
+      try {
+        const currentUser = auth.currentUser;
+        if (!currentUser) {
+          throw new Error('User not authenticated');
+        }
 
-  // Format WhatsApp message
-  const whatsappMessage = `*MKOPO CHAPCHAP - MAOMBI YA MKOPO*\n\n` +
-    `*Maelezo ya Mtumiaji:*\n` +
-    `📱 Nambari: ${formData.userInfo.phone || 'Hajatoa'}\n` +
-    `🆔 NIDA: ${formData.userInfo.nida || 'Hajatoa'}\n\n` +
-    `*Maelezo ya Mkopo:*\n` +
-    `💰 Aina: ${formData.loanType}\n` +
-    `⏳ Muda: ${formData.loanPeriod}\n` +
-    `🔢 Kiasi: TSh ${formData.loanAmount}\n` +
-    `📝 Sababu: ${formData.loanPurpose}\n\n` +
-    `*Viambatanisho:*\n` +
-    `1. Fomu ya Usajili: ${formData.signupPdf || 'Haijapatikana'}\n\n` +
-    `_Tarehe ya kuwasilisha: ${new Date().toLocaleDateString()}_`;
+        // Collect all form data
+        const formData = {
+          loanType: document.getElementById('loan-type').value,
+          loanPeriod: document.getElementById('loan-period').value,
+          loanAmount: document.getElementById('loan-amount').value,
+          loanPurpose: document.getElementById('loan-purpose').value,
+          status: 'pending',
+          timestamp: firebase.firestore.FieldValue.serverTimestamp()
+        };
 
-  // Encode for WhatsApp URL
-  const encodedMessage = encodeURIComponent(whatsappMessage);
-  
-  // Replace with your WhatsApp number (format: 255xxxxxxxxx)
-  const whatsappNumber = '255XXXXXXXXX'; // CHANGE THIS TO YOUR NUMBER
-  
-  // Open WhatsApp with pre-filled message
-  window.open(`https://wa.me/${whatsappNumber}?text=${encodedMessage}`, '_blank');
+        // Save loan application to Firestore
+        await db.collection('loanApplications').doc(currentUser.uid).set(formData, { merge: true });
 
-  setTimeout(() => {
-    spinner.style.display = 'none';
-    submitText.textContent = 'Wasilisha Maombi';
-    submitBtn.disabled = false;
+        // Show success message
+        toast.classList.add('show');
+        setTimeout(() => {
+          toast.classList.remove('show');
+          toast.classList.add('hide');
+        }, 2000);
 
-    toast.classList.add('show');
-    setTimeout(() => {
-      toast.classList.remove('show');
-      toast.classList.add('hide');
-    }, 2000);
-    setTimeout(() => {
-      window.location.href = 'profile.html';
-    }, 3000);
-  }, 2000);
+        // Redirect to profile after submission
+        setTimeout(() => {
+          window.location.href = 'profile.html';
+        }, 3000);
 
-  confirmationModal.classList.remove('show');
-});
+      } catch (error) {
+        console.error("Error submitting loan application:", error);
+        alert("Kumetokea hitilafu wakati wa kusajili maombi. Tafadhali jaribu tena.");
+      } finally {
+        spinner.style.display = 'none';
+        submitText.textContent = 'Wasilisha Maombi';
+        submitBtn.disabled = false;
+      }
+    });
   </script>
 </body>
 </html>
