@@ -6,7 +6,6 @@
   <title>Jiunge Nasi - MKOPO CHAPCHAP</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.10.5/dist/sweetalert2.min.css">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <!-- Add Firebase SDKs -->
   <script src="https://www.gstatic.com/firebasejs/11.6.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/11.6.1/firebase-auth-compat.js"></script>
@@ -586,9 +585,6 @@
 
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script>
-    // Initialize jsPDF
-    const { jsPDF } = window.jspdf;
-    
     // Initialize Firebase
     const firebaseConfig = {
       apiKey: "AIzaSyD68mTUrzH5ph8K5ZAk9iDveCRk2kxqp-k",
@@ -710,14 +706,6 @@
         
         // Save user data to Firestore
         await db.collection('users').doc(userCredential.user.uid).set(formData);
-        
-        // Generate PDF
-        const pdfUrl = await generateAndSavePDF(formData, userCredential.user.uid);
-        
-        // Update user record with PDF URL
-        await db.collection('users').doc(userCredential.user.uid).update({
-          pdfUrl: pdfUrl
-        });
         
         // Show success message
         await Swal.fire({
@@ -887,67 +875,6 @@
       
       // Get download URL
       return await fileRef.getDownloadURL();
-    }
-    
-    async function generateAndSavePDF(formData, userId) {
-      return new Promise((resolve, reject) => {
-        try {
-          const doc = new jsPDF();
-          
-          // Add logo
-          const logoData = localStorage.getItem('logo');
-          if (logoData) {
-            doc.addImage(logoData, 'JPEG', 14, 10, 30, 15);
-          }
-          
-          // Add title
-          doc.setFontSize(16);
-          doc.setTextColor(40, 40, 40);
-          doc.text("TAARIFA YA MWOMBAJI WA MKOPO", 105, 20, null, null, 'center');
-          
-          // Add personal information
-          doc.setFontSize(12);
-          doc.text("TAARIFA BINAFSI", 14, 40);
-          doc.text(`Jina Kamili: ${formData.firstName} ${formData.middleName} ${formData.lastName}`, 14, 50);
-          doc.text(`Barua Pepe: ${formData.email}`, 14, 60);
-          doc.text(`Namba ya NIDA: ${formData.nida}`, 14, 70);
-          doc.text(`Namba ya Simu: ${formData.phone}`, 14, 80);
-          doc.text(`Anuani: ${formData.mtaa}, ${formData.kata}, ${formData.wilaya}, ${formData.mkoa}`, 14, 90);
-          doc.text(`Eneo la Biashara: ${formData.biashara || 'Hakuna'}`, 14, 100);
-          
-          // Add contact person information
-          doc.text("MTU WA KARIBU", 14, 120);
-          doc.text(`Jina: ${formData.contactFirstName} ${formData.contactMiddleName} ${formData.contactLastName}`, 14, 130);
-          doc.text(`Uhusiano: ${formData.contactUhusiano}`, 14, 140);
-          doc.text(`Simu: ${formData.contactPhone}`, 14, 150);
-          doc.text(`Anuani: ${formData.contactMtaa}, ${formData.contactKata}, ${formData.contactWilaya}, ${formData.contactMkoa}`, 14, 160);
-          
-          // Add attachments information
-          doc.text("VIAMBATANISHO", 14, 180);
-          doc.text(`Picha ya Profaili: Imetumwa`, 14, 190);
-          doc.text(`Picha ya Muombaji: Imetumwa`, 14, 200);
-          doc.text(`Picha ya NIDA: Imetumwa`, 14, 210);
-          
-          // Add signature and date
-          doc.text("Saini ya Mwombaji: _________________________", 14, 230);
-          doc.text("Tarehe: _________________________", 14, 240);
-          
-          // Generate PDF blob
-          const pdfBlob = doc.output('blob');
-          
-          // Upload PDF to Firebase Storage
-          const storageRef = storage.ref();
-          const pdfRef = storageRef.child(`users/${userId}/application_${Date.now()}.pdf`);
-          
-          pdfRef.put(pdfBlob).then(() => {
-            pdfRef.getDownloadURL().then(url => {
-              resolve(url);
-            });
-          });
-        } catch (error) {
-          reject(new Error('Hitilafu wakati wa kutengeneza PDF'));
-        }
-      });
     }
     
     function previewImage(input, previewId) {
