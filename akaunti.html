@@ -5,6 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Akaunti Yangu - MKOPO CHAPCHAP</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <!-- Add Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/11.6.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/11.6.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/11.6.1/firebase-storage-compat.js"></script>
   <style>
     /* STILI ZA MSINGI */
     * {
@@ -113,6 +118,22 @@
       background: #c0392b;
     }
 
+    .spinner {
+      border: 4px solid rgba(0, 0, 0, 0.1);
+      border-radius: 50%;
+      border-top: 4px solid #3498db;
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+      margin: 20px auto;
+      display: none;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
     @media (max-width: 768px) {
       .account-container {
         padding: 1.5rem;
@@ -128,46 +149,103 @@
 
     <h1>Akaunti Yangu</h1>
 
+    <div id="spinner" class="spinner"></div>
+
     <!-- Picha ya Profaili -->
-    <img id="profilePicture" class="profile-picture" src="profile.jpg" alt="Picha ya Profaili">
+    <img id="profilePicture" class="profile-picture" src="assets/default-profile.jpg" alt="Picha ya Profaili">
 
     <!-- Taarifa za Akaunti -->
     <div class="account-info" id="accountInfo">
-      <!-- JavaScript itajaza hapa -->
+      <!-- Taarifa zitajazwa na Firebase -->
     </div>
 
     <!-- Viambatanisho -->
     <div class="upload-section">
       <h2>Kitambulisho</h2>
-      <img src="kitambulisho.jpg" alt="Kitambulisho" loading="lazy">
+      <img id="idDocument" src="assets/default-id.jpg" alt="Kitambulisho" loading="lazy">
     </div>
 
     <div class="upload-section">
       <h2>Leseni ya Biashara</h2>
-      <img src="leseni.jpg" alt="Leseni ya Biashara" loading="lazy">
+      <img id="businessLicense" src="assets/default-license.jpg" alt="Leseni ya Biashara" loading="lazy">
     </div>
 
     <button class="home-btn" onclick="window.location.href='profile.html'">Rudi kwenye Profaili</button>
   </div>
 
   <script>
-  const userData = JSON.parse(localStorage.getItem("loggedInUser"));
+    // Initialize Firebase
+    const firebaseConfig = {
+      apiKey: "AIzaSyD68mTUrzH5ph8K5ZAk9iDveCRk2kxqp-k",
+      authDomain: "mkopo-1.firebaseapp.com",
+      projectId: "mkopo-1",
+      storageBucket: "mkopo-1.appspot.com",
+      messagingSenderId: "628857354448",
+      appId: "1:628857354448:web:9d5b7cad0a59f0c29186d5"
+    };
 
-  if (!userData) {
-    alert("Tafadhali ingia kwanza.");
-    window.location.href = 'index.html';
-  }
+    const app = firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+    const storage = firebase.storage();
 
-  document.getElementById('accountInfo').innerHTML = `
-    <p><strong>Jina:</strong> ${userData.fullName || 'Haijatajwa'}</p>
-    <p><strong>Namba ya NIDA:</strong> ${userData.nida || 'Haijatajwa'}</p>
-    <p><strong>Namba ya Simu:</strong> ${userData.phone || 'Haijatajwa'}</p>
-    <p><strong>Eneo:</strong> Mkoa: ${userData.region || '—'}, Wilaya: ${userData.district || '—'}, Kata: ${userData.ward || '—'}</p>
-  `;
+    // Show loading spinner
+    document.getElementById('spinner').style.display = 'block';
 
-  const profilePicture = document.getElementById('profilePicture');
-  profilePicture.src = userData.profilePicture || "profile.jpg";
-</script>
+    // Check authentication state
+    auth.onAuthStateChanged(user => {
+      if (user) {
+        // User is signed in, fetch their data
+        fetchUserData(user.uid);
+      } else {
+        // No user is signed in, redirect to login
+        window.location.href = 'index.html';
+      }
+    });
 
+    async function fetchUserData(userId) {
+      try {
+        // Get user document from Firestore
+        const userDoc = await db.collection('users').doc(userId).get();
+        
+        if (userDoc.exists) {
+          const userData = userDoc.data();
+          
+          // Display user information
+          document.getElementById('accountInfo').innerHTML = `
+            <p><strong>Jina:</strong> ${userData.firstName || ''} ${userData.middleName || ''} ${userData.lastName || ''}</p>
+            <p><strong>Barua Pepe:</strong> ${userData.email || 'Haijatajwa'}</p>
+            <p><strong>Namba ya NIDA:</strong> ${userData.nida || 'Haijatajwa'}</p>
+            <p><strong>Namba ya Simu:</strong> ${userData.phone || 'Haijatajwa'}</p>
+            <p><strong>Eneo:</strong> Mkoa: ${userData.mkoa || '—'}, Wilaya: ${userData.wilaya || '—'}, Kata: ${userData.kata || '—'}</p>
+          `;
+
+          // Load profile picture from Firebase Storage if available
+          if (userData.photoUrl) {
+            document.getElementById('profilePicture').src = userData.photoUrl;
+          }
+
+          // Load ID document if available
+          if (userData.nidaPhotoUrl) {
+            document.getElementById('idDocument').src = userData.nidaPhotoUrl;
+          }
+
+          // Load business license if available
+          if (userData.businessLicenseUrl) {
+            document.getElementById('businessLicense').src = userData.businessLicenseUrl;
+          }
+        } else {
+          console.log("No user data found");
+          alert("Haikupatikana taarifa za mtumiaji. Tafadhali jaribu tena.");
+        }
+      } catch (error) {
+        console.error("Error fetching user data:", error);
+        alert("Kumetokea hitilafu wakati wa kuchukua taarifa. Tafadhali jaribu tena.");
+      } finally {
+        // Hide loading spinner
+        document.getElementById('spinner').style.display = 'none';
+      }
+    }
+  </script>
 </body>
 </html>
