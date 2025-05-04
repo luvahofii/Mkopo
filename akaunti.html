@@ -97,8 +97,11 @@
 
     .upload-section img {
       max-width: 100%;
+      max-height: 300px;
       border-radius: 8px;
       box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      object-fit: contain;
+      background: #f5f5f5;
     }
 
     .home-btn {
@@ -126,12 +129,19 @@
       height: 40px;
       animation: spin 1s linear infinite;
       margin: 20px auto;
-      display: none;
     }
 
     @keyframes spin {
       0% { transform: rotate(0deg); }
       100% { transform: rotate(360deg); }
+    }
+
+    .error-message {
+      color: #e74c3c;
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 5px;
+      background: #fdecea;
     }
 
     @media (max-width: 768px) {
@@ -150,6 +160,7 @@
     <h1>Akaunti Yangu</h1>
 
     <div id="spinner" class="spinner"></div>
+    <div id="errorMessage" class="error-message" style="display: none;"></div>
 
     <!-- Picha ya Profaili -->
     <img id="profilePicture" class="profile-picture" src="assets/default-profile.jpg" alt="Picha ya Profaili">
@@ -161,13 +172,13 @@
 
     <!-- Viambatanisho -->
     <div class="upload-section">
-      <h2>Kitambulisho</h2>
+      <h2>Kitambulisho cha NIDA</h2>
       <img id="idDocument" src="assets/default-id.jpg" alt="Kitambulisho" loading="lazy">
     </div>
 
     <div class="upload-section">
-      <h2>Leseni ya Biashara</h2>
-      <img id="businessLicense" src="assets/default-license.jpg" alt="Leseni ya Biashara" loading="lazy">
+      <h2>Picha ya Mwombaji</h2>
+      <img id="applicantPhoto" src="assets/default-applicant.jpg" alt="Picha ya Mwombaji" loading="lazy">
     </div>
 
     <button class="home-btn" onclick="window.location.href='profile.html'">Rudi kwenye Profaili</button>
@@ -184,23 +195,26 @@
       appId: "1:628857354448:web:9d5b7cad0a59f0c29186d5"
     };
 
+    // Initialize Firebase
     const app = firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
     const db = firebase.firestore();
     const storage = firebase.storage();
 
-    // Show loading spinner
-    document.getElementById('spinner').style.display = 'block';
-
-    // Check authentication state
-    auth.onAuthStateChanged(user => {
-      if (user) {
-        // User is signed in, fetch their data
-        fetchUserData(user.uid);
-      } else {
-        // No user is signed in, redirect to login
-        window.location.href = 'index.html';
-      }
+    // Check authentication state when page loads
+    document.addEventListener('DOMContentLoaded', () => {
+      auth.onAuthStateChanged(user => {
+        if (user) {
+          // User is signed in, fetch their data
+          fetchUserData(user.uid);
+        } else {
+          // No user is signed in, redirect to login
+          showError('Tafadhali ingia kwanza');
+          setTimeout(() => {
+            window.location.href = 'index.html';
+          }, 2000);
+        }
+      });
     });
 
     async function fetchUserData(userId) {
@@ -208,43 +222,62 @@
         // Get user document from Firestore
         const userDoc = await db.collection('users').doc(userId).get();
         
-        if (userDoc.exists) {
-          const userData = userDoc.data();
-          
-          // Display user information
-          document.getElementById('accountInfo').innerHTML = `
-            <p><strong>Jina:</strong> ${userData.firstName || ''} ${userData.middleName || ''} ${userData.lastName || ''}</p>
-            <p><strong>Barua Pepe:</strong> ${userData.email || 'Haijatajwa'}</p>
-            <p><strong>Namba ya NIDA:</strong> ${userData.nida || 'Haijatajwa'}</p>
-            <p><strong>Namba ya Simu:</strong> ${userData.phone || 'Haijatajwa'}</p>
-            <p><strong>Eneo:</strong> Mkoa: ${userData.mkoa || '—'}, Wilaya: ${userData.wilaya || '—'}, Kata: ${userData.kata || '—'}</p>
-          `;
-
-          // Load profile picture from Firebase Storage if available
-          if (userData.photoUrl) {
-            document.getElementById('profilePicture').src = userData.photoUrl;
-          }
-
-          // Load ID document if available
-          if (userData.nidaPhotoUrl) {
-            document.getElementById('idDocument').src = userData.nidaPhotoUrl;
-          }
-
-          // Load business license if available
-          if (userData.businessLicenseUrl) {
-            document.getElementById('businessLicense').src = userData.businessLicenseUrl;
-          }
-        } else {
-          console.log("No user data found");
-          alert("Haikupatikana taarifa za mtumiaji. Tafadhali jaribu tena.");
+        if (!userDoc.exists) {
+          throw new Error('Haikupatikana taarifa za mtumiaji');
         }
+
+        const userData = userDoc.data();
+        
+        // Display user information
+        document.getElementById('accountInfo').innerHTML = `
+          <p><strong>Jina:</strong> ${userData.firstName || ''} ${userData.middleName || ''} ${userData.lastName || ''}</p>
+          <p><strong>Barua Pepe:</strong> ${userData.email || 'Haijatajwa'}</p>
+          <p><strong>Namba ya NIDA:</strong> ${userData.nida || 'Haijatajwa'}</p>
+          <p><strong>Namba ya Simu:</strong> ${userData.phone || 'Haijatajwa'}</p>
+          <p><strong>Mkoa:</strong> ${userData.mkoa || '—'}</p>
+          <p><strong>Wilaya:</strong> ${userData.wilaya || '—'}</p>
+          <p><strong>Kata:</strong> ${userData.kata || '—'}</p>
+          <p><strong>Mtaa:</strong> ${userData.mtaa || '—'}</p>
+        `;
+
+        // Load images from Firebase Storage
+        await loadImage('photoUrl', 'profilePicture');
+        await loadImage('nidaPhotoUrl', 'idDocument');
+        await loadImage('applicantPhotoUrl', 'applicantPhoto');
+
       } catch (error) {
         console.error("Error fetching user data:", error);
-        alert("Kumetokea hitilafu wakati wa kuchukua taarifa. Tafadhali jaribu tena.");
+        showError(`Hitilafu: ${error.message}`);
       } finally {
-        // Hide loading spinner
         document.getElementById('spinner').style.display = 'none';
       }
+    }
+
+    async function loadImage(storageField, elementId) {
+      try {
+        const user = auth.currentUser;
+        if (!user) return;
+
+        // Get download URL for the image
+        const doc = await db.collection('users').doc(user.uid).get();
+        if (!doc.exists) return;
+
+        const imageUrl = doc.data()[storageField];
+        if (!imageUrl) return;
+
+        // Set the image source
+        document.getElementById(elementId).src = imageUrl;
+        
+      } catch (error) {
+        console.error(`Error loading ${elementId}:`, error);
+      }
+    }
+
+    function showError(message) {
+      const errorDiv = document.getElementById('errorMessage');
+      errorDiv.textContent = message;
+      errorDiv.style.display = 'block';
+      document.getElementById('spinner').style.display = 'none';
     }
   </script>
 </body>
