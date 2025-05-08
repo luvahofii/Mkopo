@@ -154,9 +154,7 @@
             const userData = userDoc.data();
             
             // Set profile information
-            document.getElementById('profileName').textContent = 
-              `${userData.firstName || ''} ${userData.middleName || ''} ${userData.lastName || ''}`.trim() || 'Guest';
-            
+            document.getElementById('profileName').textContent = 'GUEST';
             document.getElementById('profilePhone').textContent = `Simu: ${userData.phone || 'Not provided'}`;
             document.getElementById('profileNida').textContent = `NIDA: ${userData.nida || 'Not provided'}`;
             
@@ -165,11 +163,22 @@
               document.getElementById('profilePic').src = userData.photoUrl;
             }
           } else {
-            console.log("No user data found in Firestore");
+            console.warn("No user data found in Firestore");
+            // Set default values
+            document.getElementById('profileName').textContent = 'GUEST';
+            document.getElementById('profilePhone').textContent = 'Simu: Not provided';
+            document.getElementById('profileNida').textContent = 'NIDA: Not provided';
+            document.getElementById('profilePic').src = 'default_image.jpg';
+            alert("Taarifa za mtumiaji hazipatikani. Tafadhali ingia tena.");
             window.location.href = 'login.html';
           }
         } catch (error) {
           console.error("Error fetching user data:", error);
+          // Set default values
+          document.getElementById('profileName').textContent = 'GUEST';
+          document.getElementById('profilePhone').textContent = 'Simu: Not provided';
+          document.getElementById('profileNida').textContent = 'NIDA: Not provided';
+          document.getElementById('profilePic').src = 'default_image.jpg';
           alert("Hitilafu katika kupata taarifa za mtumiaji. Tafadhali jaribu tena.");
           window.location.href = 'login.html';
         }
