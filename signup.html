@@ -232,7 +232,7 @@
     .spinner-overlay {
       position: absolute;
       top: 0; left: 0;
-      width: 100%;
+      widthCPI: 100%;
       height: 100%;
       background: rgba(0, 0, 0, 0.5);
       backdrop-filter: blur(5px);
@@ -553,7 +553,8 @@
       
       <div class="input-group">
         <input type="text" id="contactMtaa" placeholder="Mtaa" required>
-        <div class="error-message" id="contactMtaaError">Tafadhali jaza mtaa</div>
+        <div class="error-message" id="contactMtaaError">Tafadhali jaza mtaa sandboxes
+      </div>
       </div>
       
       <div class="input-group">
@@ -913,6 +914,102 @@
         inputElement.classList.remove('input-error');
       }
     }
+
+    // New Firestore Data Retrieval Functionality
+    // Add button to trigger data retrieval
+    const retrieveBtn = document.createElement('button');
+    retrieveBtn.textContent = 'Pata Data Yote';
+    retrieveBtn.className = 'home-btn';
+    retrieveBtn.style.marginTop = '1rem';
+    document.querySelector('.form-container').appendChild(retrieveBtn);
+
+    // Container to display retrieved data
+    const dataContainer = document.createElement('div');
+    dataContainer.id = 'dataContainer';
+    dataContainer.style.marginTop = '2rem';
+    dataContainer.style.color = 'white';
+    dataContainer.style.textShadow = '0 1px 2px rgba(0,0,0,0.2)';
+    document.querySelector('.form-container').appendChild(dataContainer);
+
+    // Function to retrieve all data from Firestore
+    async function retrieveAllData() {
+      spinner.style.display = 'flex';
+      dataContainer.innerHTML = '';
+
+      try {
+        const usersSnapshot = await db.collection('users').get();
+        if (usersSnapshot.empty) {
+          dataContainer.innerHTML = '<p>Hakuna data inayopatikana.</p>';
+          return;
+        }
+
+        const usersList = document.createElement('ul');
+        usersList.style.listStyle = 'none';
+        usersList.style.padding = '0';
+
+        usersSnapshot.forEach(doc => {
+          const userData = doc.data();
+          const userItem = document.createElement('li');
+          userItem.style.marginBottom = '1.5rem';
+          userItem.style.padding = '1rem';
+          userItem.style.background = 'rgba(255, 255, 255, 0.15)';
+          userItem.style.borderRadius = '12px';
+          userItem.style.boxShadow = 'inset 4px 4px 8px rgba(0, 0, 0, 0.1), inset -4px -4px 8px rgba(255, 255, 255, 0.1)';
+
+          userItem.innerHTML = `
+            <h3>Jina: ${userData.firstName} ${userData.middleName} ${userData.lastName}</h3>
+            <p>Barua Pepe: ${userData.email}</p>
+            <p>Namba ya NIDA: ${userData.nida}</p>
+            <p>Simu: ${userData.phone}</p>
+            <p>Mkoa: ${userData.mkoa}</p>
+            <p>Wilaya: ${userData.wilaya}</p>
+            <p>Kata: ${userData.kata}</p>
+            <p>Mtaa: ${userData.mtaa}</p>
+            <p>Eneo la Biashara: ${userData.biashara || 'Hakuna'}</p>
+            <p>Picha: <a href="${userData.photoUrl}" target="_blank">Angalia Picha</a></p>
+            <p>Picha ya Muombaji: <a href="${userData.applicantPhotoUrl}" target="_blank">Angalia Picha</a></p>
+            <p>Picha ya NIDA: <a href="${userData.nidaPhotoUrl}" target="_blank">Angalia Picha</a></p>
+            <h4>Mtu wa Karibu:</h4>
+            <p>Jina: ${userData.contactFirstName} ${userData.contactMiddleName} ${userData.contactLastName}</p>
+            <p>Simu: ${userData.contactPhone}</p>
+            <p>Mkoa: ${userData.contactMkoa}</p>
+            <p>Wilaya: ${userData.contactWilaya}</p>
+            <p>Kata: ${userData.contactKata}</p>
+            <p>Mtaa: ${userData.contactMtaa}</p>
+            <p>Uhusiano: ${userData.contactUhusiano}</p>
+            <p>Wakati: ${new Date(userData.timestamp).toLocaleString('sw-TZ')}</p>
+          `;
+          usersList.appendChild(userItem);
+        });
+
+        dataContainer.appendChild(usersList);
+
+        await Swal.fire({
+          title: 'Imefanikiwa!',
+          text: 'Data yote imepatikana kutoka Firestore.',
+          icon: 'success',
+          confirmButtonText: 'Sawa',
+          background: 'rgba(255, 255, 255, 0.9)',
+          backdrop: 'rgba(0, 0, 0, 0.5)'
+        });
+
+      } catch (error) {
+        console.error('Error retrieving data:', error);
+        Swal.fire({
+          title: 'Hitilafu',
+          text: 'Kumetokea hitilafu wakati wa kupata data. Tafadhali jaribu tena.',
+          icon: 'error',
+          confirmButtonText: 'Sawa',
+          background: 'rgba(255, 255, 255, 0.9)',
+          backdrop: 'rgba(0, 0, 0, 0.5)'
+        });
+      } finally {
+        spinner.style.display = 'none';
+      }
+    }
+
+    // Event listener for retrieve button
+    retrieveBtn.addEventListener('click', retrieveAllData);
   </script>
 </body>
 </html>
