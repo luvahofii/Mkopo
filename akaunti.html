@@ -228,16 +228,11 @@
 
         const userData = userDoc.data();
         
-        // Display user information
+        // Display user information (GUEST display name, NIDA, and phone)
         document.getElementById('accountInfo').innerHTML = `
-          <p><strong>Jina:</strong> ${userData.firstName || ''} ${userData.middleName || ''} ${userData.lastName || ''}</p>
-          <p><strong>Barua Pepe:</strong> ${userData.email || 'Haijatajwa'}</p>
+          <p><strong>Jina:</strong> GUEST</p>
           <p><strong>Namba ya NIDA:</strong> ${userData.nida || 'Haijatajwa'}</p>
           <p><strong>Namba ya Simu:</strong> ${userData.phone || 'Haijatajwa'}</p>
-          <p><strong>Mkoa:</strong> ${userData.mkoa || '—'}</p>
-          <p><strong>Wilaya:</strong> ${userData.wilaya || '—'}</p>
-          <p><strong>Kata:</strong> ${userData.kata || '—'}</p>
-          <p><strong>Mtaa:</strong> ${userData.mtaa || '—'}</p>
         `;
 
         // Load images from Firebase Storage
