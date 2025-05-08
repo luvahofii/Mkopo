@@ -219,7 +219,6 @@
     .confirmation-box button:hover {
       background: #2980b9;
     }
-
   </style>
 </head>
 <body>
@@ -229,6 +228,7 @@
 
     <!-- Display user info -->
     <div class="info-display">
+      <p><strong>Jina:</strong> <span id="nameDisplay"></span></p>
       <p><strong>NIDA:</strong> <span id="nidaDisplay"></span></p>
       <p><strong>Simu:</strong> <span id="phoneDisplay"></span></p>
     </div>
@@ -312,12 +312,21 @@
           .then(doc => {
             if (doc.exists) {
               const userData = doc.data();
+              document.getElementById("nameDisplay").textContent = "GUEST";
               document.getElementById("nidaDisplay").textContent = userData.nida || 'Hakuna';
               document.getElementById("phoneDisplay").textContent = userData.phone || 'Hakuna';
+            } else {
+              console.warn("User document not found");
+              document.getElementById("nameDisplay").textContent = "GUEST";
+              document.getElementById("nidaDisplay").textContent = 'Hakuna';
+              document.getElementById("phoneDisplay").textContent = 'Hakuna';
             }
           })
           .catch(error => {
             console.error("Error fetching user data:", error);
+            document.getElementById("nameDisplay").textContent = "GUEST";
+            document.getElementById("nidaDisplay").textContent = 'Hakuna';
+            document.getElementById("phoneDisplay").textContent = 'Hakuna';
           });
       } else {
         // Redirect to login if not authenticated
@@ -382,4 +391,4 @@
     });
   </script>
 </body>
-</html>
+  </html>
