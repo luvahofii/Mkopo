@@ -6,11 +6,8 @@
   <title>Jiunge Nasi - MKOPO CHAPCHAP</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.10.5/dist/sweetalert2.min.css">
-  <!-- Add Firebase SDKs -->
-  <script src="https://www.gstatic.com/firebasejs/11.6.1/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/11.6.1/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/11.6.1/firebase-storage-compat.js"></script>
+  <!-- Supabase SDK -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
   <style>
     /* DEEP GLASSMORPHISM + NEUMORPHISM STYLING */
     :root {
@@ -232,7 +229,7 @@
     .spinner-overlay {
       position: absolute;
       top: 0; left: 0;
-      widthCPI: 100%;
+      width: 100%;
       height: 100%;
       background: rgba(0, 0, 0, 0.5);
       backdrop-filter: blur(5px);
@@ -366,7 +363,7 @@
     <div class="bubble"></div>
     <div class="bubble"></div>
     <div class="bubble"></div>
-    <div class="bubble"></div>
+    <div class coûrier="bubble"></div>
     <div class="bubble"></div>
   </div>
 
@@ -384,7 +381,7 @@
       <h2>TAARIFA BINAFSI</h2>
       <div class="name-boxes">
         <div class="name-input">
-          <input type="text" id="firstName" placeholder="Jina la Kwanza" required>
+          <input type="text" id="firstName" placeholder=" Jina la Kwanza" required>
           <div class="error-message" id="firstNameError">Tafadhali jaza jina la kwanza</div>
         </div>
         <div class="name-input">
@@ -398,12 +395,14 @@
       </div>
       
       <!-- Added Email Field -->
+      <label for="email">Barua Pepe</label>
       <div class="input-group">
         <input type="email" id="email" placeholder="Barua Pepe" required>
         <div class="error-message" id="emailError">Tafadhali jaza barua pepe sahihi</div>
       </div>
       
       <!-- Added Password Field -->
+      <label for="password">Nenosiri</label>
       <div class="input-group">
         <input type="password" id="password" placeholder="Nenosiri" required>
         <div class="error-message" id="passwordError">Nenosiri linapaswa kuwa na herufi 6 au zaidi</div>
@@ -489,7 +488,7 @@
           <div class="error-message" id="contactFirstNameError">Tafadhali jaza jina la kwanza</div>
         </div>
         <div class="name-input">
-          <input type="text" id="contactMiddleName" placeholder="Jina la Kati" required>
+          <input type="text" id="contactMiddleName" placeholder=" Jina la Kati" required>
           <div class="error-message" id="contactMiddleNameError">Tafadhali jaza jina la kati</div>
         </div>
         <div class="name-input">
@@ -531,7 +530,7 @@
           <option value="Pwani">Pwani</option>
           <option value="Rukwa">Rukwa</option>
           <option value="Ruvuma">Ruvuma</option>
-          <option value="Shinyanga">Shinyanga</option>
+          <option value="Shinyanga"> Shinyanga</option>
           <option value="Simiyu">Simiyu</option>
           <option value="Singida">Singida</option>
           <option value="Songwe">Songwe</option>
@@ -553,8 +552,7 @@
       
       <div class="input-group">
         <input type="text" id="contactMtaa" placeholder="Mtaa" required>
-        <div class="error-message" id="contactMtaaError">Tafadhali jaza mtaa sandboxes
-      </div>
+        <div class="error-message" id="contactMtaaError">Tafadhali jaza mtaa</div>
       </div>
       
       <div class="input-group">
@@ -586,21 +584,12 @@
 
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script>
-    // Initialize Firebase
-    const firebaseConfig = {
-      apiKey: "AIzaSyD68mTUrzH5ph8K5ZAk9iDveCRk2kxqp-k",
-      authDomain: "mkopo-1.firebaseapp.com",
-      projectId: "mkopo-1",
-      storageBucket: "mkopo-1.appspot.com",
-      messagingSenderId: "628857354448",
-      appId: "1:628857354448:web:9d5b7cad0a59f0c29186d5"
-    };
+    // Initialize Supabase
+    const supabase = Supabase.createClient(
+      'https://muyloislhyiyevhjbipt.supabase.co',
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im11eWxvaXNsaHlpeWV2aGpiaXB0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDcxNzMzMTEsImV4cCI6MjA2Mjc0OTMxMX0.Xa54eiwhx9lUq_FG0EQKOPRfhcwl9f-HRAdeVPvslyw'
+    );
 
-    const app = firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
-    const db = firebase.firestore();
-    const storage = firebase.storage();
-    
     // DOM Elements
     const form = document.getElementById('signupForm');
     const spinner = document.getElementById('spinnerOverlay');
@@ -685,33 +674,44 @@
         }
         
         // Validate password
-        if (!validatePassword(document.getElementById('password'))) {
+        if (!validatePassword(document.getContentById('password'))) {
           throw new Error(errorMessages.password);
         }
         
         // Create user with email and password
-        const userCredential = await auth.createUserWithEmailAndPassword(
-          formData.email, 
-          formData.password
-        );
+        const { data: { user }, error: authError } = await supabase.auth.signUp({
+          email: formData.email,
+          password: formData.password
+        });
         
-        // Upload images to Firebase Storage
-        const photoUrl = await uploadImage('photo', userCredential.user.uid);
-        const applicantPhotoUrl = await uploadImage('applicantPhoto', userCredential.user.uid);
-        const nidaPhotoUrl = await uploadImage('nidaPhoto', userCredential.user.uid);
+        if (authError) {
+          throw new Error(authError.message);
+        }
         
-        // Add image URLs to form data
-        formData.photoUrl = photoUrl;
-        formData.applicantPhotoUrl = applicantPhotoUrl;
-        formData.nidaPhotoUrl = nidaPhotoUrl;
+        // Upload images to Supabase Storage
+        const photoUrl = await uploadImage('photo', user.id);
+        const applicantPhotoUrl = await uploadImage('applicantPhoto', user.id);
+        const nidaPhotoUrl = await uploadImage('nidaPhoto', user.id);
         
-        // Save user data to Firestore
-        await db.collection('users').doc(userCredential.user.uid).set(formData);
+        // Add image URLs and user_id to form data
+        formData.photo_url = photoUrl;
+        formData.applicant_photo_url = applicantPhotoUrl;
+        formData.nida_photo_url = nidaPhotoUrl;
+        formData.user_id = user.id;
+        
+        // Save user data to Supabase
+        const { error: dbError } = await supabase
+          .from('users')
+          .insert([formData]);
+        
+        if (dbError) {
+          throw new Error(dbError.message);
+        }
         
         // Show success message
         await Swal.fire({
           title: 'Hongera!',
-          text: 'Umefanikiwa kujiunga na mfumo wa Mkopo ChapChap',
+          text: 'Umefanikiwa kujiunga na mfumo wa Mkopo ChapChap. Angalia barua pepe yako kwa uthibitisho.',
           icon: 'success',
           confirmButtonText: 'Endelea',
           background: 'rgba(255, 255, 255, 0.9)',
@@ -829,28 +829,27 @@
     
     function collectFormData() {
       return {
-        firstName: document.getElementById('firstName').value.trim(),
-        middleName: document.getElementById('middleName').value.trim(),
-        lastName: document.getElementById('lastName').value.trim(),
+        first_name: document.getElementById('firstName').value.trim(),
+        middle_name: document.getElementById('middleName').value.trim(),
+        last_name: document.getElementById('lastName').value.trim(),
         email: document.getElementById('email').value.trim(),
-        password: document.getElementById('password').value.trim(),
         nida: document.getElementById('nida').value.trim(),
         phone: document.getElementById('phone').value.trim(),
         mkoa: document.getElementById('mkoa').value,
         wilaya: document.getElementById('wilaya').value.trim(),
-        kata: document.getElementById('kata').value.trim(),
+        kata: document.getContentById('kata').value.trim(),
         mtaa: document.getElementById('mtaa').value.trim(),
         biashara: document.getElementById('biashara').value.trim(),
-        contactFirstName: document.getElementById('contactFirstName').value.trim(),
-        contactMiddleName: document.getElementById('contactMiddleName').value.trim(),
-        contactLastName: document.getElementById('contactLastName').value.trim(),
-        contactPhone: document.getElementById('contactPhone').value.trim(),
-        contactMkoa: document.getElementById('contactMkoa').value,
-        contactWilaya: document.getElementById('contactWilaya').value.trim(),
-        contactKata: document.getElementById('contactKata').value.trim(),
-        contactMtaa: document.getElementById('contactMtaa').value.trim(),
-        contactUhusiano: document.getElementById('contactUhusiano').value.trim(),
-        timestamp: new Date().toISOString()
+        contact_first_name: document.getElementById('contactFirstName').value.trim(),
+        contact_middle_name: document.getElementById('contactMiddleName').value.trim(),
+        contact_last_name: document.getElementById('contactLastName').value.trim(),
+        contact_phone: document.getElementById('contactPhone').value.trim(),
+        contact_mkoa: document.getElementById('contactMkoa').value,
+        contact_wilaya: document.getElementById('contactWilaya').value.trim(),
+        contact_kata: document.getElementById('contactKata').value.trim(),
+        contact_mtaa: document.getElementById('contactMtaa').value.trim(),
+        contact_uhusiano: document.getElementById('contactUhusiano').value.trim(),
+        created_at: new Date().toISOString()
       };
     }
     
@@ -867,15 +866,25 @@
         throw new Error(`Picha ya ${inputId} ni kubwa sana. Tafadhali tumia picha chini ya 2MB.`);
       }
       
-      // Create storage reference
-      const storageRef = storage.ref();
-      const fileRef = storageRef.child(`users/${userId}/${inputId}_${Date.now()}`);
+      // Create unique file path
+      const fileExt = file.name.split('.').pop();
+      const filePath = `users/${userId}/${inputId}_${Date.now()}.${fileExt}`;
       
-      // Upload file
-      await fileRef.put(file);
+      // Upload to Supabase Storage
+      const { error } = await supabase.storage
+        .from('user-images')
+        .upload(filePath, file);
       
-      // Get download URL
-      return await fileRef.getDownloadURL();
+      if (error) {
+        throw new Error(`Kushindwa kupakia picha ya ${inputId}: ${error.message}`);
+      }
+      
+      // Get public URL
+      const { data } = supabase.storage
+        .from('user-images')
+        .getPublicUrl(filePath);
+      
+      return data.publicUrl;
     }
     
     function previewImage(input, previewId) {
@@ -914,102 +923,6 @@
         inputElement.classList.remove('input-error');
       }
     }
-
-    // New Firestore Data Retrieval Functionality
-    // Add button to trigger data retrieval
-    const retrieveBtn = document.createElement('button');
-    retrieveBtn.textContent = 'Pata Data Yote';
-    retrieveBtn.className = 'home-btn';
-    retrieveBtn.style.marginTop = '1rem';
-    document.querySelector('.form-container').appendChild(retrieveBtn);
-
-    // Container to display retrieved data
-    const dataContainer = document.createElement('div');
-    dataContainer.id = 'dataContainer';
-    dataContainer.style.marginTop = '2rem';
-    dataContainer.style.color = 'white';
-    dataContainer.style.textShadow = '0 1px 2px rgba(0,0,0,0.2)';
-    document.querySelector('.form-container').appendChild(dataContainer);
-
-    // Function to retrieve all data from Firestore
-    async function retrieveAllData() {
-      spinner.style.display = 'flex';
-      dataContainer.innerHTML = '';
-
-      try {
-        const usersSnapshot = await db.collection('users').get();
-        if (usersSnapshot.empty) {
-          dataContainer.innerHTML = '<p>Hakuna data inayopatikana.</p>';
-          return;
-        }
-
-        const usersList = document.createElement('ul');
-        usersList.style.listStyle = 'none';
-        usersList.style.padding = '0';
-
-        usersSnapshot.forEach(doc => {
-          const userData = doc.data();
-          const userItem = document.createElement('li');
-          userItem.style.marginBottom = '1.5rem';
-          userItem.style.padding = '1rem';
-          userItem.style.background = 'rgba(255, 255, 255, 0.15)';
-          userItem.style.borderRadius = '12px';
-          userItem.style.boxShadow = 'inset 4px 4px 8px rgba(0, 0, 0, 0.1), inset -4px -4px 8px rgba(255, 255, 255, 0.1)';
-
-          userItem.innerHTML = `
-            <h3>Jina: ${userData.firstName} ${userData.middleName} ${userData.lastName}</h3>
-            <p>Barua Pepe: ${userData.email}</p>
-            <p>Namba ya NIDA: ${userData.nida}</p>
-            <p>Simu: ${userData.phone}</p>
-            <p>Mkoa: ${userData.mkoa}</p>
-            <p>Wilaya: ${userData.wilaya}</p>
-            <p>Kata: ${userData.kata}</p>
-            <p>Mtaa: ${userData.mtaa}</p>
-            <p>Eneo la Biashara: ${userData.biashara || 'Hakuna'}</p>
-            <p>Picha: <a href="${userData.photoUrl}" target="_blank">Angalia Picha</a></p>
-            <p>Picha ya Muombaji: <a href="${userData.applicantPhotoUrl}" target="_blank">Angalia Picha</a></p>
-            <p>Picha ya NIDA: <a href="${userData.nidaPhotoUrl}" target="_blank">Angalia Picha</a></p>
-            <h4>Mtu wa Karibu:</h4>
-            <p>Jina: ${userData.contactFirstName} ${userData.contactMiddleName} ${userData.contactLastName}</p>
-            <p>Simu: ${userData.contactPhone}</p>
-            <p>Mkoa: ${userData.contactMkoa}</p>
-            <p>Wilaya: ${userData.contactWilaya}</p>
-            <p>Kata: ${userData.contactKata}</p>
-            <p>Mtaa: ${userData.contactMtaa}</p>
-            <p>Uhusiano: ${userData.contactUhusiano}</p>
-            <p>Wakati: ${new Date(userData.timestamp).toLocaleString('sw-TZ')}</p>
-          `;
-          usersList.appendChild(userItem);
-        });
-
-        dataContainer.appendChild(usersList);
-
-        await Swal.fire({
-          title: 'Imefanikiwa!',
-          text: 'Data yote imepatikana kutoka Firestore.',
-          icon: 'success',
-          confirmButtonText: 'Sawa',
-          background: 'rgba(255, 255, 255, 0.9)',
-          backdrop: 'rgba(0, 0, 0, 0.5)'
-        });
-
-      } catch (error) {
-        console.error('Error retrieving data:', error);
-        Swal.fire({
-          title: 'Hitilafu',
-          text: 'Kumetokea hitilafu wakati wa kupata data. Tafadhali jaribu tena.',
-          icon: 'error',
-          confirmButtonText: 'Sawa',
-          background: 'rgba(255, 255, 255, 0.9)',
-          backdrop: 'rgba(0, 0, 0, 0.5)'
-        });
-      } finally {
-        spinner.style.display = 'none';
-      }
-    }
-
-    // Event listener for retrieve button
-    retrieveBtn.addEventListener('click', retrieveAllData);
   </script>
 </body>
 </html>
