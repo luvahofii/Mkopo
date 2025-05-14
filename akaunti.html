@@ -5,11 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Akaunti Yangu - MKOPO CHAPCHAP</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-  <!-- Add Firebase SDKs -->
-  <script src="https://www.gstatic.com/firebasejs/11.6.1/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/11.6.1/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/11.6.1/firebase-storage-compat.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.10.5/dist/sweetalert2.min.css">
+  <!-- Supabase SDK -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
   <style>
     /* STILI ZA MSINGI */
     * {
@@ -152,14 +150,13 @@
   </style>
 </head>
 <body>
-
   <div class="account-container">
     <!-- Logo ya Kampuni -->
     <img src="logo.png" alt="Logo ya Kampuni" class="logo">
 
     <h1>Akaunti Yangu</h1>
 
-    <div id="spinner" class="spinner"></div>
+    <div id="spinner" class="spinner" style="display: block;"></div>
     <div id="errorMessage" class="error-message" style="display: none;"></div>
 
     <!-- Picha ya Profaili -->
@@ -167,7 +164,7 @@
 
     <!-- Taarifa za Akaunti -->
     <div class="account-info" id="accountInfo">
-      <!-- Taarifa zitajazwa na Firebase -->
+      <!-- Taarifa zitajazwa na Supabase -->
     </div>
 
     <!-- Viambatanisho -->
@@ -184,96 +181,102 @@
     <button class="home-btn" onclick="window.location.href='profile.html'">Rudi kwenye Profaili</button>
   </div>
 
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script>
-    // Initialize Firebase
-    const firebaseConfig = {
-      apiKey: "AIzaSyD68mTUrzH5ph8K5ZAk9iDveCRk2kxqp-k",
-      authDomain: "mkopo-1.firebaseapp.com",
-      projectId: "mkopo-1",
-      storageBucket: "mkopo-1.appspot.com",
-      messagingSenderId: "628857354448",
-      appId: "1:628857354448:web:9d5b7cad0a59f0c29186d5"
-    };
-
-    // Initialize Firebase
-    const app = firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
-    const db = firebase.firestore();
-    const storage = firebase.storage();
+    // Initialize Supabase
+    const supabase = Supabase.createClient(
+      'https://muyloislhyiyevhjbipt.supabase.co',
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im11eWxvaXNsaHlpeWV2aGpiaXB0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDcxNzMzMTEsImV4cCI6MjA2Mjc0OTMxMX0.Xa54eiwhx9lUq_FG0EQKOPRfhcwl9f-HRAdeVPvslyw'
+    );
 
     // Check authentication state when page loads
-    document.addEventListener('DOMContentLoaded', () => {
-      auth.onAuthStateChanged(user => {
-        if (user) {
-          // User is signed in, fetch their data
-          fetchUserData(user.uid);
-        } else {
-          // No user is signed in, redirect to login
-          showError('Tafadhali ingia kwanza');
-          setTimeout(() => {
-            window.location.href = 'index.html';
-          }, 2000);
-        }
-      });
+    document.addEventListener('DOMContentLoaded', async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session) {
+        // User is signed in, fetch their data
+        await fetchUserData(session.user.id);
+      } else {
+        // No user is signed in, redirect to login
+        await Swal.fire({
+          title: 'Hitilafu',
+          text: 'Tafadhali ingia kwanza',
+          icon: 'error',
+          confirmButtonText: 'Sawa',
+          background: 'rgba(255, 255, 255, 0.9)',
+          backdrop: 'rgba(0, 0, 0, 0.5)'
+        });
+        window.location.href = 'login.html';
+      }
     });
 
     async function fetchUserData(userId) {
       try {
-        // Get user document from Firestore
-        const userDoc = await db.collection('users').doc(userId).get();
+        // Check sessionStorage for userData
+        let userData = JSON.parse(sessionStorage.getItem('userData'));
         
-        if (!userDoc.exists) {
-          throw new Error('Haikupatikana taarifa za mtumiaji');
+        // If userData is not in sessionStorage, fetch from Supabase
+        if (!userData) {
+          const { data, error } = await supabase
+            .from('users')
+            .select('*')
+            .eq('user_id', userId)
+            .single();
+          
+          if (error) {
+            throw new Error('Kushindwa kupata taarifa za mtumiaji');
+          }
+          
+          if (!data) {
+            throw new Error('Taarifa za mtumiaji hazipatikani');
+          }
+          
+          userData = data;
+          sessionStorage.setItem('userData', JSON.stringify(userData));
         }
-
-        const userData = userDoc.data();
         
-        // Display user information (GUEST display name, NIDA, and phone)
+        // Display user information (full name, NIDA, phone)
         document.getElementById('accountInfo').innerHTML = `
-          <p><strong>Jina:</strong> GUEST</p>
+          <p><strong>Jina:</strong> ${`${userData.first_name || ''} ${userData.middle_name || ''} ${userData.last_name || ''}`.trim() || 'Guest'}</p>
           <p><strong>Namba ya NIDA:</strong> ${userData.nida || 'Haijatajwa'}</p>
           <p><strong>Namba ya Simu:</strong> ${userData.phone || 'Haijatajwa'}</p>
         `;
 
-        // Load images from Firebase Storage
-        await loadImage('photoUrl', 'profilePicture');
-        await loadImage('nidaPhotoUrl', 'idDocument');
-        await loadImage('applicantPhotoUrl', 'applicantPhoto');
-
+        // Load images from Supabase Storage
+        document.getElementById('profilePicture').src = userData.photo_url || 'assets/default-profile.jpg';
+        document.getElementById('idDocument').src = userData.nida_photo_url || 'assets/default-id.jpg';
+        document.getElementById('applicantPhoto').src = userData.applicant_photo_url || 'assets/default-applicant.jpg';
+        
       } catch (error) {
-        console.error("Error fetching user data:", error);
-        showError(`Hitilafu: ${error.message}`);
+        console.error('Error fetching user data:', error);
+        await Swal.fire({
+          title: 'Hitilafu',
+          text: error.message || 'Hitilafu katika kupata taarifa za mtumiaji. Tafadhali ingia tena.',
+          icon: 'error',
+          confirmButtonText: 'Sawa',
+          background: 'rgba(255, 255, 255, 0.9)',
+          backdrop: 'rgba(0, 0, 0, 0.5)'
+        });
+        window.location.href = 'login.html';
       } finally {
         document.getElementById('spinner').style.display = 'none';
       }
     }
 
-    async function loadImage(storageField, elementId) {
-      try {
-        const user = auth.currentUser;
-        if (!user) return;
-
-        // Get download URL for the image
-        const doc = await db.collection('users').doc(user.uid).get();
-        if (!doc.exists) return;
-
-        const imageUrl = doc.data()[storageField];
-        if (!imageUrl) return;
-
-        // Set the image source
-        document.getElementById(elementId).src = imageUrl;
-        
-      } catch (error) {
-        console.error(`Error loading ${elementId}:`, error);
+    // Listen for auth state changes
+    supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'SIGNED_OUT') {
+        Swal.fire({
+          title: 'Hitilafu',
+          text: 'Tafadhali ingia kwanza.',
+          icon: 'error',
+          confirmButtonText: 'Sawa',
+          background: 'rgba(255, 255, 255, 0.9)',
+          backdrop: 'rgba(0, 0, 0, 0.5)'
+        }).then(() => {
+          window.location.href = 'login.html';
+        });
       }
-    }
-
-    function showError(message) {
-      const errorDiv = document.getElementById('errorMessage');
-      errorDiv.textContent = message;
-      errorDiv.style.display = 'block';
-      document.getElementById('spinner').style.display = 'none';
-    }
+    });
   </script>
 </body>
 </html>
