@@ -5,10 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Omba Mkopo - MKOPO CHAPCHAP</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-  <!-- Add Firebase SDKs -->
-  <script src="https://www.gstatic.com/firebasejs/11.6.1/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/11.6.1/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore-compat.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.10.5/dist/sweetalert2.min.css">
+  <!-- Supabase SDK -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
   <style>
     /* STILI ZA MSINGI */
     * {
@@ -223,7 +222,7 @@
 </head>
 <body>
   <div class="loan-form">
-    <img src="assets/logo.png" alt="MKOPO CHAPCHAP Logo" class="logo">
+    <img src="logo.png" alt="MKOPO CHAPCHAP Logo" class="logo">
     <h1>Omba Mkopo</h1>
 
     <!-- Display user info -->
@@ -279,20 +278,13 @@
     </div>
   </div>
 
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script>
-    // Initialize Firebase
-    const firebaseConfig = {
-      apiKey: "AIzaSyD68mTUrzH5ph8K5ZAk9iDveCRk2kxqp-k",
-      authDomain: "mkopo-1.firebaseapp.com",
-      projectId: "mkopo-1",
-      storageBucket: "mkopo-1.appspot.com",
-      messagingSenderId: "628857354448",
-      appId: "1:628857354448:web:9d5b7cad0a59f0c29186d5"
-    };
-
-    const app = firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
-    const db = firebase.firestore();
+    // Initialize Supabase
+    const supabase = Supabase.createClient(
+      'https://muyloislhyiyevhjbipt.supabase.co',
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im11eWxvaXNsaHlpeWV2aGpiaXB0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDcxNzMzMTEsImV4cCI6MjA2Mjc0OTMxMX0.Xa54eiwhx9lUq_FG0EQKOPRfhcwl9f-HRAdeVPvslyw'
+    );
 
     // DOM Elements
     const loanForm = document.getElementById('loanForm');
@@ -304,32 +296,50 @@
     const confirmSubmit = document.getElementById('confirmSubmit');
     const cancelSubmit = document.getElementById('cancelSubmit');
 
+    // WhatsApp number (replace with your number, e.g., +255123456789)
+    const WHATSAPP_NUMBER = '+255123456789'; // TODO: Update with your number
+
     // Load current user info
-    auth.onAuthStateChanged(user => {
-      if (user) {
-        // Fetch user data from Firestore
-        db.collection('users').doc(user.uid).get()
-          .then(doc => {
-            if (doc.exists) {
-              const userData = doc.data();
-              document.getElementById("nameDisplay").textContent = "GUEST";
-              document.getElementById("nidaDisplay").textContent = userData.nida || 'Hakuna';
-              document.getElementById("phoneDisplay").textContent = userData.phone || 'Hakuna';
-            } else {
-              console.warn("User document not found");
-              document.getElementById("nameDisplay").textContent = "GUEST";
-              document.getElementById("nidaDisplay").textContent = 'Hakuna';
-              document.getElementById("phoneDisplay").textContent = 'Hakuna';
-            }
-          })
-          .catch(error => {
-            console.error("Error fetching user data:", error);
-            document.getElementById("nameDisplay").textContent = "GUEST";
-            document.getElementById("nidaDisplay").textContent = 'Hakuna';
-            document.getElementById("phoneDisplay").textContent = 'Hakuna';
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
+      if (session) {
+        try {
+          let userData = JSON.parse(sessionStorage.getItem('userData'));
+          if (!userData) {
+            const { data, error } = await supabase
+              .from('users')
+              .select('*')
+              .eq('user_id', session.user.id)
+              .single();
+            if (error) throw new Error('Kushindwa kupata taarifa za mtumiaji');
+            if (!data) throw new Error('Taarifa za mtumiaji hazipatikani');
+            userData = data;
+            sessionStorage.setItem('userData', JSON.stringify(userData));
+          }
+          document.getElementById('nameDisplay').textContent = 
+            `${userData.first_name || ''} ${userData.middle_name || ''} ${userData.last_name || ''}`.trim() || 'Guest';
+          document.getElementById('nidaDisplay').textContent = userData.nida || 'Hakuna';
+          document.getElementById('phoneDisplay').textContent = userData.phone || 'Hakuna';
+        } catch (error) {
+          console.error('Error fetching user data:', error);
+          await Swal.fire({
+            title: 'Hitilafu',
+            text: 'Hitilafu katika kupata taarifa za mtumiaji. Tafadhali ingia tena.',
+            icon: 'error',
+            confirmButtonText: 'Sawa',
+            background: 'rgba(255, 255, 255, 0.9)',
+            backdrop: 'rgba(0, 0, 0, 0.5)'
           });
+          window.location.href = 'login.html';
+        }
       } else {
-        // Redirect to login if not authenticated
+        await Swal.fire({
+          title: 'Hitilafu',
+          text: 'Tafadhali ingia kwanza.',
+          icon: 'error',
+          confirmButtonText: 'Sawa',
+          background: 'rgba(255, 255, 255, 0.9)',
+          backdrop: 'rgba(0, 0, 0, 0.5)'
+        });
         window.location.href = 'login.html';
       }
     });
@@ -350,45 +360,88 @@
       confirmationModal.classList.remove('show');
 
       try {
-        const currentUser = auth.currentUser;
-        if (!currentUser) {
-          throw new Error('User not authenticated');
-        }
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session) throw new Error('User not authenticated');
 
-        // Collect all form data
+        // Collect form data
         const formData = {
-          loanType: document.getElementById('loan-type').value,
-          loanPeriod: document.getElementById('loan-period').value,
-          loanAmount: document.getElementById('loan-amount').value,
-          loanPurpose: document.getElementById('loan-purpose').value,
-          status: 'pending',
-          timestamp: firebase.firestore.FieldValue.serverTimestamp()
+          user_id: session.user.id,
+          loan_type: document.getElementById('loan-type').value,
+          loan_period: document.getElementById('loan-period').value,
+          loan_amount: parseFloat(document.getElementById('loan-amount').value),
+          loan_purpose: document.getElementById('loan-purpose').value,
+          status: 'pending'
         };
 
-        // Save loan application to Firestore
-        await db.collection('loanApplications').doc(currentUser.uid).set(formData, { merge: true });
+        // Save to Supabase
+        const { error } = await supabase
+          .from('loan_requests')
+          .insert([formData]);
+
+        if (error) throw new Error('Kushindwa kusajili maombi ya mkopo');
+
+        // Get user data for WhatsApp message
+        let userData = JSON.parse(sessionStorage.getItem('userData'));
+        const fullName = `${userData.first_name || ''} ${userData.middle_name || ''} ${userData.last_name || ''}`.trim() || 'Guest';
+
+        // Send to WhatsApp
+        const message = `Maombi ya Mkopo - MKOPO CHAPCHAP\n` +
+                        `Jina: ${fullName}\n` +
+                        `NIDA: ${userData.nida || 'Hakuna'}\n` +
+                        `Simu: ${userData.phone || 'Hakuna'}\n` +
+                        `Aina ya Mkopo: ${formData.loan_type}\n` +
+                        `Muda wa Kulipa: ${formData.loan_period}\n` +
+                        `Kiasi: TSh ${formData.loan_amount.toLocaleString()}\n` +
+                        `Sababu: ${formData.loan_purpose}`;
+        const encodedMessage = encodeURIComponent(message);
+        const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodedMessage}`;
+        window.open(whatsappUrl, '_blank');
 
         // Show success message
-        toast.classList.add('show');
-        setTimeout(() => {
-          toast.classList.remove('show');
-          toast.classList.add('hide');
-        }, 2000);
+        await Swal.fire({
+          title: 'Mafanikio!',
+          text: 'Maombi yametumwa kwa mafanikio!',
+          icon: 'success',
+          confirmButtonText: 'Sawa',
+          background: 'rgba(255, 255, 255, 0.9)',
+          backdrop: 'rgba(0, 0, 0, 0.5)'
+        });
 
-        // Redirect to profile after submission
-        setTimeout(() => {
-          window.location.href = 'profile.html';
-        }, 3000);
+        // Redirect to profile
+        window.location.href = 'profile.html';
 
       } catch (error) {
-        console.error("Error submitting loan application:", error);
-        alert("Kumetokea hitilafu wakati wa kusajili maombi. Tafadhali jaribu tena.");
+        console.error('Error submitting loan application:', error);
+        await Swal.fire({
+          title: 'Hitilafu',
+          text: 'Kumetokea hitilafu wakati wa kusajili maombi. Tafadhali jaribu tena.',
+          icon: 'error',
+          confirmButtonText: 'Sawa',
+          background: 'rgba(255, 255, 255, 0.9)',
+          backdrop: 'rgba(0, 0, 0, 0.5)'
+        });
       } finally {
         spinner.style.display = 'none';
         submitText.textContent = 'Wasilisha Maombi';
         submitBtn.disabled = false;
       }
     });
+
+    // Listen for auth state changes
+    supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'SIGNED_OUT') {
+        Swal.fire({
+          title: 'Hitilafu',
+          text: 'Tafadhali ingia kwanza.',
+          icon: 'error',
+          confirmButtonText: 'Sawa',
+          background: 'rgba(255, 255, 255, 0.9)',
+          backdrop: 'rgba(0, 0, 0, 0.5)'
+        }).then(() => {
+          window.location.href = 'login.html';
+        });
+      }
+    });
   </script>
 </body>
-  </html>
+</html>
