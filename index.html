@@ -1,350 +1,447 @@
 <!DOCTYPE html>
 <html lang="sw">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>MKOPO CHAPCHAP</title>
-
-  <!-- SEO and Meta -->
-  <meta name="description" content="Mkopo Chapchap - Pata mkopo wa haraka kwa wajasiriamali, wafanyabiashara, wakulima, na wanafunzi nchini Tanzania.">
-  <meta name="keywords" content="mkopo, mkopo chapchap, mkopo wa haraka, Tanzania, wajasiriamali, wakulima, wanafunzi">
-  <meta name="author" content="Mkopo Chapchap Team">
-
-  <!-- Manifest for PWA -->
-  <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#00b4d8">
-
-  <!-- Favicon -->
-  <link rel="icon" type="image/png" href="favicon.png">
-
-  <!-- Font Awesome -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
-
-</body>
-</html>
-
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Omba Mkopo - MKOPO CHAPCHAP</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.10.5/dist/sweetalert2.min.css">
+  <!-- Supabase SDK -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
   <style>
+    /* STILI ZA MSINGI */
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      font-family: 'Arial', sans-serif;
     }
 
     body {
-      background: linear-gradient(to right, #e0f7fa, #e1f5fe);
+      background: linear-gradient(135deg, #f8f9fa, #e9ecef);
       min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
+      padding: 2rem;
     }
 
-    /* Popup Style */
-    #popup {
-      position: fixed;
-      top: 0; left: 0;
-      width: 100%;
-      height: 100%;
-      background: 
-        linear-gradient(rgba(255,255,255,0.8), rgba(255,255,255,0.8)),
-        url('file_00000000935451f6a6234d9f2c87d40a_conversation_id=67f6bfdb-c50c-8002-9faf-3eab487f3477&message_id=dbff5e5e-8b19-41ee-9385-293a3d45d583 (5).PNG') 
-        center/cover no-repeat;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      z-index: 9999;
-      transition: opacity 1s ease;
-    }
-
-    #popup img {
-      width: 400px;
-      height: auto;
-      margin-bottom: 20px;
-    }
-
-    .loading-line {
-      width: 200px;
-      height: 4px;
-      background: #ddd;
-      border-radius: 2px;
-      overflow: hidden;
+    .loan-form {
+      background: white;
+      border-radius: 15px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+      padding: 2rem;
+      max-width: 800px;
+      margin: 0 auto;
+      text-align: center;
       position: relative;
     }
 
-    .loading-line::after {
-      content: "";
-      position: absolute;
-      top: 0;
-      left: -50%;
-      width: 50%;
-      height: 100%;
-      background: linear-gradient(to right, #0077b6, #00b4d8);
-      animation: loadingAnimation 5s linear forwards, glowAnimation 1.5s infinite alternate;
-    }
-
-    @keyframes loadingAnimation {
-      0% { left: -50%; }
-      100% { left: 100%; }
-    }
-
-    @keyframes glowAnimation {
-      0% { box-shadow: 0 0 10px rgba(0, 183, 216, 0.5); }
-      100% { box-shadow: 0 0 20px rgba(0, 183, 216, 1); }
-    }
-
-    .banner {
-      background: 
-        linear-gradient(90deg, #0077b6cc, #00b4d8cc),
-        url('pesa.png') 
-        center/cover no-repeat;
-      color: #fff;
-      text-align: center;
-      padding: 3rem 1rem;
-      animation: fadeIn 1.5s ease-in-out;
-      border-radius: 0 0 20px 20px;
-    }
-
-    .banner h1 {
-      font-size: 2.8rem;
+    .loan-form img.logo {
+      width: 150px;
       margin-bottom: 1rem;
+      animation: fadeZoom 1.2s ease forwards;
+      opacity: 0;
+      transform: scale(0.8);
+    }
+
+    @keyframes fadeZoom {
+      to {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+
+    .loan-form h1 {
+      color: #2c3e50;
+      margin-bottom: 1.5rem;
+    }
+
+    .loan-form label {
+      display: block;
+      margin-bottom: 0.5rem;
+      color: #7f8c8d;
+      text-align: left;
+    }
+
+    .loan-form input,
+    .loan-form select,
+    .loan-form textarea {
+      width: 100%;
+      padding: 12px;
+      margin-bottom: 1.5rem;
+      border: 2px solid #ecf0f1;
+      border-radius: 8px;
+      transition: border-color 0.3s;
+    }
+
+    .loan-form input:focus,
+    .loan-form select:focus,
+    .loan-form textarea:focus {
+      border-color: #3498db;
+      outline: none;
+    }
+
+    .loan-form button[type="submit"] {
+      width: 100%;
+      padding: 12px;
+      background: linear-gradient(90deg, #27ae60, #219a52);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+      font-size: 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      transition: all 0.3s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .loan-form button[type="submit"]:hover {
+      opacity: 0.9;
+      transform: translateY(-2px);
+    }
+
+    .spinner {
+      border: 3px solid #f3f3f3;
+      border-top: 3px solid white;
+      border-radius: 50%;
+      width: 18px;
+      height: 18px;
+      animation: spin 1s linear infinite;
+      position: absolute;
+      display: none;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .home-btn {
+      margin-top: 1rem;
+      width: 100%;
+      padding: 10px;
+      background: #e74c3c;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .home-btn:hover {
+      background: #c0392b;
+    }
+
+    .info-display {
+      text-align: left;
+      margin-bottom: 1.5rem;
+      background: #f6f6f6;
+      padding: 1rem;
+      border-radius: 10px;
+    }
+
+    .info-display p {
+      margin-bottom: 0.5rem;
+      font-size: 0.95rem;
+      color: #2c3e50;
+    }
+
+    /* Toast Style */
+    .toast {
+      position: fixed;
+      top: 30px;
+      right: 30px;
+      background: #27ae60;
+      color: white;
+      padding: 15px 20px;
+      border-radius: 8px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+      opacity: 0;
+      transform: translateY(-20px);
+      transition: all 0.5s ease, opacity 1s ease;
+      z-index: 1000;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .toast.hide {
+      opacity: 0;
+      transform: translateY(-20px);
+    }
+
+    /* Confirmation Modal */
+    .confirmation-modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.5);
       display: flex;
       justify-content: center;
       align-items: center;
-      gap: 12px;
-      text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
-      animation: slideInDown 1s ease-in-out;
-    }
-
-    .provider-logos, .bank-logos {
-      display: flex;
-      justify-content: center;
-      gap: 15px;
-      margin-bottom: 1.5rem;
-      flex-wrap: wrap;
-    }
-
-    .provider-logos img,
-    .bank-logos img {
-      height: 40px;
-      width: auto;
-      border-radius: 10px;
-      background: #ffffffaa;
-      padding: 5px;
-      transition: transform 0.3s ease;
-    }
-
-    .provider-logos img:hover,
-    .bank-logos img:hover {
-      transform: scale(1.1);
-    }
-
-    .buttons {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 1rem;
-      margin-top: 2rem;
-    }
-
-    .buttons button {
-      background: #ffffff22;
-      color: #fff;
-      border: 2px solid #fff;
-      border-radius: 10px;
-      padding: 1rem 1.5rem;
-      font-size: 1rem;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      backdrop-filter: blur(6px);
-      min-width: 220px;
       opacity: 0;
-      transform: translateY(30px);
-      animation: buttonBounce 1s forwards;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+      z-index: 1000;
     }
 
-    .buttons button:nth-child(1) { animation-delay: 0.3s; }
-    .buttons button:nth-child(2) { animation-delay: 0.5s; }
-    .buttons button:nth-child(3) { animation-delay: 0.7s; }
-    .buttons button:nth-child(4) { animation-delay: 0.9s; }
-    .buttons button:nth-child(5) { animation-delay: 1.1s; }
-    .buttons button:nth-child(6) { animation-delay: 1.3s; }
-
-    @keyframes buttonBounce {
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
+    .confirmation-modal.show {
+      opacity: 1;
+      pointer-events: all;
     }
 
-    .buttons button:hover {
-      background-color: #00b4d8;
-      transform: translateY(-5px);
-      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
-    }
-
-    .login-banner {
-      background: 
-        linear-gradient(#ffffffcc, #ffffffcc),
-        url('file_00000000935451f6a6234d9f2c87d40a_conversation_id=67f6bfdb-c50c-8002-9faf-3eab487f3477&message_id=dbff5e5e-8b19-41ee-9385-293a3d45d583 (5).PNG') 
-        center/cover no-repeat;
-      background-blend-mode: overlay;
-      border-radius: 15px;
-      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-      margin: 10px auto 0 auto;
-      max-width: 700px;
+    .confirmation-box {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
       text-align: center;
-      padding: 2rem;
-      animation: fadeIn 2s ease;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
     }
 
-    .login-banner h2 {
-      color: #023e8a;
-      margin-bottom: 1rem;
-      font-size: 1.8rem;
-      animation: slideInLeft 1s ease;
-    }
-
-    .login-banner p {
-      color: #495057;
-      margin-bottom: 1.5rem;
-      font-size: 1rem;
-      animation: slideInRight 1s ease;
-    }
-
-    .login-buttons {
-      display: flex;
-      justify-content: center;
-      gap: 1rem;
-      flex-wrap: wrap;
-    }
-
-    #login-btn, #signup-btn {
-      padding: 0.75rem 2rem;
-      font-size: 1rem;
+    .confirmation-box button {
+      margin: 10px;
+      padding: 10px 20px;
+      background: #3498db;
+      color: white;
       border: none;
-      border-radius: 25px;
-      font-weight: 600;
+      border-radius: 5px;
       cursor: pointer;
-      transition: background 0.3s ease;
     }
 
-    #login-btn {
-      background: linear-gradient(to right, #0077b6, #00b4d8);
-      color: #fff;
-    }
-
-    #signup-btn {
-      background: linear-gradient(to right, #43aa8b, #90be6d);
-      color: #fff;
-    }
-
-    #login-btn:hover, #signup-btn:hover {
-      opacity: 0.9;
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
-    }
-
-    @keyframes slideInDown {
-      from { transform: translateY(-50px); opacity: 0; }
-      to { transform: translateY(0); opacity: 1; }
-    }
-
-    @keyframes slideInLeft {
-      from { transform: translateX(-30px); opacity: 0; }
-      to { transform: translateX(0); opacity: 1; }
-    }
-
-    @keyframes slideInRight {
-      from { transform: translateX(30px); opacity: 0; }
-      to { transform: translateX(0); opacity: 1; }
-    }
-
-    @media (max-width: 600px) {
-      .banner h1 {
-        font-size: 2rem;
-        flex-direction: column;
-      }
-
-      .buttons button {
-        font-size: 0.9rem;
-        padding: 0.8rem;
-      }
-
-      .provider-logos img,
-      .bank-logos img {
-        height: 30px;
-      }
-
-      #popup img {
-        width: 250px;
-      }
-
-      .loading-line {
-        width: 150px;
-      }
+    .confirmation-box button:hover {
+      background: #2980b9;
     }
   </style>
 </head>
 <body>
+  <div class="loan-form">
+    <img src="logo.png" alt="MKOPO CHAPCHAP Logo" class="logo">
+    <h1>Omba Mkopo</h1>
 
-<!-- Popup -->
-<div id="popup">
-  <img src="logo.png" alt="Mkopo Chapchap Logo">
-  <div class="loading-line"></div>
-</div>
-<script>
-  window.addEventListener('load', function() {
-    const popup = document.getElementById('popup');
-    setTimeout(() => {
-      popup.style.opacity = '0';
-      setTimeout(() => popup.style.display = 'none', 1000);
-    }, 5000); // Wait 5 seconds before starting to hide
-  });
-</script>
+    <!-- Display user info -->
+    <div class="info-display">
+      <p><strong>Jina:</strong> <span id="nameDisplay"></span></p>
+      <p><strong>NIDA:</strong> <span id="nidaDisplay"></span></p>
+      <p><strong>Simu:</strong> <span id="phoneDisplay"></span></p>
+    </div>
 
-<!-- Main Banner -->
-<div class="banner">
-  <div class="provider-logos">
-    <img src="airtel.png" alt="Airtel Money Service Logo" />
-    <img src="vodacom.png" alt="Vodacom M-Pesa Logo" />
-    <img src="yas.png" alt="YAS Mobile Money Logo" />
-    <img src="halotel.png" alt="Halotel HaloPesa Logo" />
+    <form id="loanForm">
+      <label for="loan-type">Aina ya Mkopo:</label>
+      <select id="loan-type" required>
+        <option value="">Chagua Aina ya Mkopo</option>
+        <option value="mkopo_wa_mwanafunzi">Mkopo wa Mwanafunzi</option>
+        <option value="mkopo_wa_wakulima">Mkopo wa Wakulima</option>
+        <option value="mkopo_binafsi">Mkopo Binafsi</option>
+        <option value="mkopo_wa_wajasiriamali">Mkopo wa Wajasiriamali</option>
+        <option value="mkopo_wa_wafanyabiashara_wa_kat">Mkopo wa Wafanyabiashara wa Kati</option>
+      </select>
+
+      <label for="loan-period">Muda wa Kulipa:</label>
+      <select id="loan-period" required>
+        <option value="">Chagua Muda wa Kulipa</option>
+        <option value="1_month">Miezi 1</option>
+        <option value="6_months">Miezi 6</option>
+        <option value="1_year">Mwaka 1</option>
+        <option value="2_years">Miaka 2</option>
+        <option value="3_years">Miaka 3</option>
+      </select>
+
+      <label for="loan-amount">Kiasi cha Mkopo (TSh):</label>
+      <input type="number" id="loan-amount" placeholder="Weka kiasi unachohitaji" required>
+
+      <label for="loan-purpose">Sababu ya Mkopo:</label>
+      <textarea id="loan-purpose" rows="4" placeholder="Eleza sababu ya mkopo" required></textarea>
+
+      <button type="submit">
+        <div class="spinner" id="spinner"></div>
+        <span id="submit-text">Wasilisha Maombi</span>
+      </button>
+    </form>
+
+    <button class="home-btn" onclick="window.location.href='profile.html'">Rudi kwenye Profaili</button>
   </div>
 
-  <h1>MKOPO CHAPCHAP</h1>
+  <div id="toast" class="toast">Maombi yametumwa kwa mafanikio!</div>
 
-  <div class="buttons">
-    <button onclick="location.href='wajasiriamali.html'">Wajasiriamali</button>
-    <button onclick="location.href='wafanyabiashara.html'">Wafanyabiashara wa Kati</button>
-    <button onclick="location.href='wakulima.html'">Wakulima</button>
-    <button onclick="location.href='wanafunzi.html'">Wanafunzi</button>
-    <button onclick="location.href='binafsi.html'">Binafsi</button>
-    <button onclick="location.href='muhimu.html'">MUHIMU</button>
+  <div id="confirmationModal" class="confirmation-modal">
+    <div class="confirmation-box">
+      <p>Je, unataka kweli kutuma maombi?</p>
+      <button id="confirmSubmit">Ndio</button>
+      <button id="cancelSubmit">Hapana</button>
+    </div>
   </div>
-</div>
 
-<!-- Bank Logos -->
-<div class="bank-logos">
-  <img src="nmb.png" alt="NMB Bank Logo" />
-  <img src="crdb.png" alt="CRDB Bank Logo" />
-  <img src="azania.png" alt="Azania Bank Logo" />
-  <img src="exim.png" alt="Exim Bank Logo" />
-  <img src="nbc.png" alt="NBC Bank Logo" />
-</div>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script>
+    // Initialize Supabase
+    const supabase = Supabase.createClient(
+      'https://muyloislhyiyevhjbipt.supabase.co',
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im11eWxvaXNsaHlpeWV2aGpiaXB0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDcxNzMzMTEsImV4cCI6MjA2Mjc0OTMxMX0.Xa54eiwhx9lUq_FG0EQKOPRfhcwl9f-HRAdeVPvslyw'
+    );
 
-<!-- Login Section -->
-<div class="login-banner">
-  <h2>KARIBU UPATE MKOPO NDANI YA MASAA 24</h2>
-  <p>Kupata mkopo chapchap, ingia au jiunge nasi.</p>
-  <div class="login-buttons">
-    <button id="login-btn" onclick="location.href='login.html'">Ingia</button>
-    <button id="signup-btn" onclick="location.href='signup.html'">Jiunge Nasi</button>
-  </div>
-</div>
+    // DOM Elements
+    const loanForm = document.getElementById('loanForm');
+    const submitBtn = loanForm.querySelector('button[type="submit"]');
+    const spinner = document.getElementById('spinner');
+    const submitText = document.getElementById('submit-text');
+    const toast = document.getElementById('toast');
+    const confirmationModal = document.getElementById('confirmationModal');
+    const confirmSubmit = document.getElementById('confirmSubmit');
+    const cancelSubmit = document.getElementById('cancelSubmit');
 
+    // WhatsApp number (replace with your number, e.g., +255123456789)
+    const WHATSAPP_NUMBER = '+255123456789'; // TODO: Update with your number
+
+    // Load current user info
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
+      if (session) {
+        try {
+          let userData = JSON.parse(sessionStorage.getItem('userData'));
+          if (!userData) {
+            const { data, error } = await supabase
+              .from('users')
+              .select('*')
+              .eq('user_id', session.user.id)
+              .single();
+            if (error) throw new Error('Kushindwa kupata taarifa za mtumiaji');
+            if (!data) throw new Error('Taarifa za mtumiaji hazipatikani');
+            userData = data;
+            sessionStorage.setItem('userData', JSON.stringify(userData));
+          }
+          document.getElementById('nameDisplay').textContent = 
+            `${userData.first_name || ''} ${userData.middle_name || ''} ${userData.last_name || ''}`.trim() || 'Guest';
+          document.getElementById('nidaDisplay').textContent = userData.nida || 'Hakuna';
+          document.getElementById('phoneDisplay').textContent = userData.phone || 'Hakuna';
+        } catch (error) {
+          console.error('Error fetching user data:', error);
+          await Swal.fire({
+            title: 'Hitilafu',
+            text: 'Hitilafu katika kupata taarifa za mtumiaji. Tafadhali ingia tena.',
+            icon: 'error',
+            confirmButtonText: 'Sawa',
+            background: 'rgba(255, 255, 255, 0.9)',
+            backdrop: 'rgba(0, 0, 0, 0.5)'
+          });
+          window.location.href = 'login.html';
+        }
+      } else {
+        await Swal.fire({
+          title: 'Hitilafu',
+          text: 'Tafadhali ingia kwanza.',
+          icon: 'error',
+          confirmButtonText: 'Sawa',
+          background: 'rgba(255, 255, 255, 0.9)',
+          backdrop: 'rgba(0, 0, 0, 0.5)'
+        });
+        window.location.href = 'login.html';
+      }
+    });
+
+    loanForm.addEventListener('submit', function(e) {
+      e.preventDefault();
+      confirmationModal.classList.add('show');
+    });
+
+    cancelSubmit.addEventListener('click', () => {
+      confirmationModal.classList.remove('show');
+    });
+
+    confirmSubmit.addEventListener('click', async () => {
+      spinner.style.display = 'inline-block';
+      submitText.textContent = 'Tafadhali subiri...';
+      submitBtn.disabled = true;
+      confirmationModal.classList.remove('show');
+
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session) throw new Error('User not authenticated');
+
+        // Collect form data
+        const formData = {
+          user_id: session.user.id,
+          loan_type: document.getElementById('loan-type').value,
+          loan_period: document.getElementById('loan-period').value,
+          loan_amount: parseFloat(document.getElementById('loan-amount').value),
+          loan_purpose: document.getElementById('loan-purpose').value,
+          status: 'pending'
+        };
+
+        // Save to Supabase
+        const { error } = await supabase
+          .from('loan_requests')
+          .insert([formData]);
+
+        if (error) throw new Error('Kushindwa kusajili maombi ya mkopo');
+
+        // Get user data for WhatsApp message
+        let userData = JSON.parse(sessionStorage.getItem('userData'));
+        const fullName = `${userData.first_name || ''} ${userData.middle_name || ''} ${userData.last_name || ''}`.trim() || 'Guest';
+
+        // Send to WhatsApp
+        const message = `Maombi ya Mkopo - MKOPO CHAPCHAP\n` +
+                        `Jina: ${fullName}\n` +
+                        `NIDA: ${userData.nida || 'Hakuna'}\n` +
+                        `Simu: ${userData.phone || 'Hakuna'}\n` +
+                        `Aina ya Mkopo: ${formData.loan_type}\n` +
+                        `Muda wa Kulipa: ${formData.loan_period}\n` +
+                        `Kiasi: TSh ${formData.loan_amount.toLocaleString()}\n` +
+                        `Sababu: ${formData.loan_purpose}`;
+        const encodedMessage = encodeURIComponent(message);
+        const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodedMessage}`;
+        window.open(whatsappUrl, '_blank');
+
+        // Show success message
+        await Swal.fire({
+          title: 'Mafanikio!',
+          text: 'Maombi yametumwa kwa mafanikio!',
+          icon: 'success',
+          confirmButtonText: 'Sawa',
+          background: 'rgba(255, 255, 255, 0.9)',
+          backdrop: 'rgba(0, 0, 0, 0.5)'
+        });
+
+        // Redirect to profile
+        window.location.href = 'profile.html';
+
+      } catch (error) {
+        console.error('Error submitting loan application:', error);
+        await Swal.fire({
+          title: 'Hitilafu',
+          text: 'Kumetokea hitilafu wakati wa kusajili maombi. Tafadhali jaribu tena.',
+          icon: 'error',
+          confirmButtonText: 'Sawa',
+          background: 'rgba(255, 255, 255, 0.9)',
+          backdrop: 'rgba(0, 0, 0, 0.5)'
+        });
+      } finally {
+        spinner.style.display = 'none';
+        submitText.textContent = 'Wasilisha Maombi';
+        submitBtn.disabled = false;
+      }
+    });
+
+    // Listen for auth state changes
+    supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'SIGNED_OUT') {
+        Swal.fire({
+          title: 'Hitilafu',
+          text: 'Tafadhali ingia kwanza.',
+          icon: 'error',
+          confirmButtonText: 'Sawa',
+          background: 'rgba(255, 255, 255, 0.9)',
+          backdrop: 'rgba(0, 0, 0, 0.5)'
+        }).then(() => {
+          window.location.href = 'login.html';
+        });
+      }
+    });
+  </script>
 </body>
-  </html>
+</html>
